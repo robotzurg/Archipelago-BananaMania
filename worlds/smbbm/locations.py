@@ -518,13 +518,27 @@ def create_all_locations(world: BananaManiaWorld) -> None:
     create_events(world)
 
 
+def _include_location(name: str, world: BananaManiaWorld) -> bool:
+    """Return True if this stage location should be created given the current options."""
+    if "Stage Clear" in name:
+        return True
+    if ("Banana Collector" in name or "Banana Complete" in name) and not world.options.banana_missions:
+        return False
+    if "Time Limit" in name and not world.options.time_missions:
+        return False
+    if ("Green Goal" in name or "Red Goal" in name or "Nonstop" in name) and not world.options.extra_goals:
+        return False
+    return True
+
+
 def create_regular_locations(world: BananaManiaWorld) -> None:
     # Group stage locations by world number (W1 through W10).
     for world_num in range(1, 11):
         prefix = f"[W{world_num}-"
         region = world.get_region(f"World {world_num}")
         stage_locations = get_location_names_with_ids(
-            [name for name in LOCATION_NAME_TO_ID if name.startswith(prefix)]
+            [name for name in LOCATION_NAME_TO_ID
+             if name.startswith(prefix) and _include_location(name, world)]
         )
         region.add_locations(stage_locations, BananaManiaLocation)
 
