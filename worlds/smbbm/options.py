@@ -23,6 +23,13 @@ class IncludeExtraGoals(Toggle):
 
     display_name = "Extra Goals"
 
+class IncludeNonstopMissions(Toggle):
+    """
+    Include the Deluxe Stages in logic.
+    """
+
+    display_name = "Deluxe Stages"
+
 class WorldStructure(Choice):
     """
     How the SMB2 campaign world items should be structured.
