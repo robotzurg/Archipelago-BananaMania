@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
+from dataclasses import dataclass, field
+from enum import Enum
 from typing import TYPE_CHECKING
 
 from BaseClasses import Location
@@ -9,506 +12,609 @@ from . import items
 if TYPE_CHECKING:
     from .world import BananaManiaWorld
 
-# Every location must have a unique integer ID associated with it.
-# We will have a lookup from location name to ID here that, in world.py, we will import and bind to the world class.
-# Even if a location doesn't exist on specific options, it must be present in this lookup.
-LOCATION_NAME_TO_ID = {
-    # W1-1
-    "[W1-1] Stage Clear": 1,
-    "[W1-1] Banana Collector 10": 2,
-    "[W1-1] Time Limit 10": 3,
-    # W1-2
-    "[W1-2] Stage Clear": 11,
-    "[W1-2] Banana Collector 20": 12,
-    "[W1-2] Time Limit 10": 13,
-    # W1-3
-    "[W1-3] Stage Clear": 21,
-    "[W1-3] Banana Collector 30": 22,
-    "[W1-3] Time Limit 10": 23,
-    # W1-4
-    "[W1-4] Stage Clear": 31,
-    "[W1-4] Banana Collector 25": 32,
-    "[W1-4] Time Limit 10": 33,
-    "[W1-4] Green Goal": 34,
-    # W1-5
-    "[W1-5] Stage Clear": 41,
-    "[W1-5] Banana Collector 30": 42,
-    "[W1-5] Time Limit 10": 43,
-    "[W1-5] Nonstop": 44,
-    # W1-6
-    "[W1-6] Stage Clear": 51,
-    "[W1-6] Banana Collector 50": 52,
-    "[W1-6] Time Limit 10": 53,
-    # W1-7
-    "[W1-7] Stage Clear": 61,
-    "[W1-7] Banana Collector 77": 62,
-    "[W1-7] Time Limit 10": 63,
-    # W1-8
-    "[W1-8] Stage Clear": 71,
-    "[W1-8] Banana Collector 70": 72,
-    "[W1-8] Time Limit 30": 73,
-    "[W1-8] Nonstop": 74,
-    # W1-9
-    "[W1-9] Stage Clear": 81,
-    "[W1-9] Banana Collector 20": 82,
-    "[W1-9] Time Limit 15": 83,
-    # W1-10
-    "[W1-10] Stage Clear": 91,
-    "[W1-10] Banana Collector 60": 92,
-    "[W1-10] Time Limit 35": 93,
+# Used if we need to collect all bananas
+ALL_BANANAS = -1
+# Item Requirements are a list of strings or any ofs
+Requirement = tuple["str | AnyOf", ...]
 
-    # W2-1
-    "[W2-1] Stage Clear": 101,
-    "[W2-1] Banana Collector 25": 102,
-    "[W2-1] Time Limit 10": 103,
-    # W2-2
-    "[W2-2] Stage Clear": 111,
-    "[W2-2] Banana Collector 20": 112,
-    "[W2-2] Time Limit 15": 113,
-    # W2-3
-    "[W2-3] Stage Clear": 121,
-    "[W2-3] Banana Complete": 122,
-    "[W2-3] Time Limit 5": 123,
-    # W2-4
-    "[W2-4] Stage Clear": 131,
-    "[W2-4] Banana Collector 55": 132,
-    "[W2-4] Time Limit 30": 133,
-    # W2-5
-    "[W2-5] Stage Clear": 141,
-    "[W2-5] Banana Collector 25": 142,
-    "[W2-5] Time Limit 15": 143,
-    # W2-6
-    "[W2-6] Stage Clear": 151,
-    "[W2-6] Banana Collector 25": 152,
-    "[W2-6] Time Limit 10": 153,
-    # W2-7
-    "[W2-7] Stage Clear": 161,
-    "[W2-7] Banana Collector 70": 162,
-    "[W2-7] Time Limit 20": 163,
-    # W2-8
-    "[W2-8] Stage Clear": 171,
-    "[W2-8] Banana Collector 30": 172,
-    "[W2-8] Time Limit 15": 173,
-    "[W2-8] Green Goal": 174,
-    "[W2-8] Red Goal": 175,
-    # W2-9
-    "[W2-9] Stage Clear": 181,
-    "[W2-9] Banana Collector 15": 182,
-    "[W2-9] Time Limit 15": 183,
-    "[W2-9] Nonstop": 184,
-    # W2-10
-    "[W2-10] Stage Clear": 191,
-    "[W2-10] Banana Collector 18": 192,
-    "[W2-10] Time Limit 15": 193,
 
-    # W3-1
-    "[W3-1] Stage Clear": 201,
-    "[W3-1] Banana Complete": 202,
-    "[W3-1] Time Limit 20": 203,
-    # W3-2
-    "[W3-2] Stage Clear": 211,
-    "[W3-2] Banana Collector 30": 212,
-    "[W3-2] Time Limit 15": 213,
-    # W3-3
-    "[W3-3] Stage Clear": 221,
-    "[W3-3] Banana Collector 70": 222,
-    "[W3-3] Time Limit 20": 223,
-    # W3-4
-    "[W3-4] Stage Clear": 231,
-    "[W3-4] Banana Complete": 232,
-    "[W3-4] Time Limit 40": 233,
-    "[W3-4] Nonstop": 234,
-    # W3-5
-    "[W3-5] Stage Clear": 241,
-    "[W3-5] Banana Complete": 242,
-    "[W3-5] Time Limit 15": 243,
-    # W3-6
-    "[W3-6] Stage Clear": 251,
-    "[W3-6] Banana Collector 30": 252,
-    "[W3-6] Time Limit 5": 253,
-    "[W3-6] Green Goal": 254,
-    "[W3-6] Red Goal": 255,
-    # W3-7
-    "[W3-7] Stage Clear": 261,
-    "[W3-7] Banana Collector 40": 262,
-    "[W3-7] Time Limit 15": 263,
-    # W3-8
-    "[W3-8] Stage Clear": 271,
-    "[W3-8] Banana Collector 15": 272,
-    "[W3-8] Time Limit 15": 273,
-    # W3-9
-    "[W3-9] Stage Clear": 281,
-    "[W3-9] Banana Collector 25": 282,
-    "[W3-9] Time Limit 30": 283,
-    # W3-10
-    "[W3-10] Stage Clear": 291,
-    "[W3-10] Banana Collector 38": 292,
-    "[W3-10] Time Limit 15": 293,
-    "[W3-10] Green Goal": 294,
+@dataclass(frozen=True)
+class AnyOf:
+    """One requirement satisfied by ANY of several alternatives.
 
-    # W4-1
-    "[W4-1] Stage Clear": 301,
-    "[W4-1] Banana Collector 20": 302,
-    "[W4-1] Time Limit 10": 303,
-    "[W4-1] Green Goal": 304,
-    # W4-2
-    "[W4-2] Stage Clear": 311,
-    "[W4-2] Banana Collector 20": 312,
-    "[W4-2] Time Limit 15": 313,
-    "[W4-2] Nonstop": 314,
-    # W4-3
-    "[W4-3] Stage Clear": 321,
-    "[W4-3] Banana Collector 25": 322,
-    "[W4-3] Time Limit 15": 323,
-    # W4-4
-    "[W4-4] Stage Clear": 331,
-    "[W4-4] Banana Collector 30": 332,
-    "[W4-4] Time Limit 20": 333,
-    # W4-5
-    "[W4-5] Stage Clear": 341,
-    "[W4-5] Banana Collector 30": 342,
-    "[W4-5] Time Limit 10": 343,
-    "[W4-5] Nonstop": 344,
-    # W4-6
-    "[W4-6] Stage Clear": 351,
-    "[W4-6] Banana Collector 10": 352,
-    "[W4-6] Time Limit 20": 353,
-    "[W4-6] Green Goal": 354,
-    # W4-7
-    "[W4-7] Stage Clear": 361,
-    "[W4-7] Banana Collector 35": 362,
-    "[W4-7] Time Limit 15": 363,
-    "[W4-7] Green Goal": 364,
-    "[W4-7] Red Goal": 365,
-    # W4-8
-    "[W4-8] Stage Clear": 371,
-    "[W4-8] Banana Complete": 372,
-    "[W4-8] Time Limit 30": 373,
-    "[W4-8] Green Goal": 374,
-    # W4-9
-    "[W4-9] Stage Clear": 381,
-    "[W4-9] Banana Collector 40": 382,
-    "[W4-9] Time Limit 55": 383,
-    # W4-10
-    "[W4-10] Stage Clear": 391,
-    "[W4-10] Banana Complete": 392,
-    "[W4-10] Time Limit 30": 393,
+    Each alternative is itself an AND-set, so
+    ``AnyOf("Wormholes", ("Normal Switches", "Fast Switches"))`` reads as
+    "Wormholes, OR both switch types". A bare string is shorthand for a one-item set,
+    and alternatives may nest further AnyOf groups.
+    """
 
-    # W5-1
-    "[W5-1] Stage Clear": 401,
-    "[W5-1] Banana Collector 50": 402,
-    "[W5-1] Time Limit 25": 403,
-    "[W5-1] Nonstop": 404,
-    # W5-2
-    "[W5-2] Stage Clear": 411,
-    "[W5-2] Banana Collector 50": 412,
-    "[W5-2] Time Limit 20": 413,
-    "[W5-2] Green Goal": 414,
-    # W5-3
-    "[W5-3] Stage Clear": 421,
-    "[W5-3] Banana Collector 10": 422,
-    "[W5-3] Time Limit 15": 423,
-    # W5-4
-    "[W5-4] Stage Clear": 431,
-    "[W5-4] Banana Complete": 432,
-    "[W5-4] Time Limit 10": 433,
-    # W5-5
-    "[W5-5] Stage Clear": 441,
-    "[W5-5] Banana Collector 20": 442,
-    "[W5-5] Time Limit 15": 443,
-    # W5-6
-    "[W5-6] Stage Clear": 451,
-    "[W5-6] Banana Collector 25": 452,
-    "[W5-6] Time Limit 15": 453,
-    "[W5-6] Green Goal": 454,
-    "[W5-6] Red Goal": 455,
-    # W5-7
-    "[W5-7] Stage Clear": 461,
-    "[W5-7] Banana Collector 25": 462,
-    "[W5-7] Time Limit 20": 463,
-    # W5-8
-    "[W5-8] Stage Clear": 471,
-    "[W5-8] Banana Collector 25": 472,
-    "[W5-8] Time Limit 15": 473,
-    # W5-9
-    "[W5-9] Stage Clear": 481,
-    "[W5-9] Banana Complete": 482,
-    "[W5-9] Time Limit 10": 483,
-    # W5-10
-    "[W5-10] Stage Clear": 491,
-    "[W5-10] Banana Collector 20": 492,
-    "[W5-10] Time Limit 20": 493,
+    alternatives: tuple[Requirement, ...]
 
-    # W6-1
-    "[W6-1] Stage Clear": 501,
-    "[W6-1] Banana Collector 25": 502,
-    "[W6-1] Time Limit 10": 503,
-    # W6-2
-    "[W6-2] Stage Clear": 511,
-    "[W6-2] Banana Collector 21": 512,
-    "[W6-2] Time Limit 10": 513,
-    "[W6-2] Green Goal": 514,
-    # W6-3
-    "[W6-3] Stage Clear": 521,
-    "[W6-3] Banana Collector 70": 522,
-    "[W6-3] Time Limit 35": 523,
-    # W6-4
-    "[W6-4] Stage Clear": 531,
-    "[W6-4] Banana Collector 35": 532,
-    "[W6-4] Time Limit 5": 533,
-    # W6-5
-    "[W6-5] Stage Clear": 541,
-    "[W6-5] Banana Collector 20": 542,
-    "[W6-5] Time Limit 30": 543,
-    "[W6-5] Green Goal": 544,
-    "[W6-5] Red Goal": 545,
-    # W6-6
-    "[W6-6] Stage Clear": 551,
-    "[W6-6] Banana Collector 20": 552,
-    "[W6-6] Time Limit 30": 553,
-    # W6-7
-    "[W6-7] Stage Clear": 561,
-    "[W6-7] Banana Collector 15": 562,
-    "[W6-7] Time Limit 20": 563,
-    # W6-8
-    "[W6-8] Stage Clear": 571,
-    "[W6-8] Banana Collector 20": 572,
-    "[W6-8] Time Limit 15": 573,
-    "[W6-8] Green Goal": 574,
-    # W6-9
-    "[W6-9] Stage Clear": 581,
-    "[W6-9] Banana Collector 9": 582,
-    "[W6-9] Time Limit 15": 583,
-    # W6-10
-    "[W6-10] Stage Clear": 591,
-    "[W6-10] Banana Collector 10": 592,
-    "[W6-10] Time Limit 20": 593,
+    def __init__(self, *alternatives: str | AnyOf | Sequence[str | AnyOf]) -> None:
+        object.__setattr__(self, "alternatives", tuple(
+            (alt,) if isinstance(alt, (str, AnyOf)) else tuple(alt)
+            for alt in alternatives
+        ))
 
-    # W7-1
-    "[W7-1] Stage Clear": 601,
-    "[W7-1] Banana Collector 20": 602,
-    "[W7-1] Time Limit 20": 603,
-    # W7-2
-    "[W7-2] Stage Clear": 611,
-    "[W7-2] Banana Collector 20": 612,
-    "[W7-2] Time Limit 10": 613,
-    "[W7-2] Nonstop": 614,
-    # W7-3
-    "[W7-3] Stage Clear": 621,
-    "[W7-3] Banana Collector 20": 622,
-    "[W7-3] Time Limit 20": 623,
-    # W7-4
-    "[W7-4] Stage Clear": 631,
-    "[W7-4] Banana Collector 25": 632,
-    "[W7-4] Time Limit 15": 633,
-    # W7-5
-    "[W7-5] Stage Clear": 641,
-    "[W7-5] Banana Collector 15": 642,
-    "[W7-5] Time Limit 30": 643,
-    "[W7-5] Nonstop": 644,
-    # W7-6
-    "[W7-6] Stage Clear": 651,
-    "[W7-6] Banana Collector 15": 652,
-    "[W7-6] Time Limit 50": 653,
-    # W7-7
-    "[W7-7] Stage Clear": 661,
-    "[W7-7] Banana Collector 10": 662,
-    "[W7-7] Time Limit 25": 663,
-    # W7-8
-    "[W7-8] Stage Clear": 671,
-    "[W7-8] Banana Collector 15": 672,
-    "[W7-8] Time Limit 25": 673,
-    # W7-9
-    "[W7-9] Stage Clear": 681,
-    "[W7-9] Banana Collector 10": 682,
-    "[W7-9] Time Limit 25": 683,
-    "[W7-9] Green Goal": 684,
-    "[W7-9] Red Goal": 685,
-    # W7-10
-    "[W7-10] Stage Clear": 691,
-    "[W7-10] Banana Complete": 692,
-    "[W7-10] Time Limit 10": 693,
-    "[W7-10] Nonstop": 694,
 
-    # W8-1
-    "[W8-1] Stage Clear": 701,
-    "[W8-1] Banana Collector 20": 702,
-    "[W8-1] Time Limit 20": 703,
-    # W8-2
-    "[W8-2] Stage Clear": 711,
-    "[W8-2] Banana Collector 16": 712,
-    "[W8-2] Time Limit 20": 713,
-    # W8-3
-    "[W8-3] Stage Clear": 721,
-    "[W8-3] Banana Collector 21": 722,
-    "[W8-3] Time Limit 10": 723,
-    # W8-4
-    "[W8-4] Stage Clear": 731,
-    "[W8-4] Banana Collector 30": 732,
-    "[W8-4] Time Limit 40": 733,
-    "[W8-4] Green Goal": 734,
-    # W8-5
-    "[W8-5] Stage Clear": 741,
-    "[W8-5] Banana Collector 28": 742,
-    "[W8-5] Time Limit 10": 743,
-    # W8-6
-    "[W8-6] Stage Clear": 751,
-    "[W8-6] Banana Collector 10": 752,
-    "[W8-6] Time Limit 30": 753,
-    "[W8-6] Green Goal": 754,
-    # W8-7
-    "[W8-7] Stage Clear": 761,
-    "[W8-7] Banana Collector 10": 762,
-    "[W8-7] Time Limit 40": 763,
-    "[W8-7] Green Goal": 764,
-    # W8-8
-    "[W8-8] Stage Clear": 771,
-    "[W8-8] Banana Collector 40": 772,
-    "[W8-8] Time Limit 30": 773,
-    # W8-9
-    "[W8-9] Stage Clear": 781,
-    "[W8-9] Banana Collector 10": 782,
-    "[W8-9] Time Limit 30": 783,
-    # W8-10
-    "[W8-10] Stage Clear": 791,
-    "[W8-10] Banana Collector 10": 792,
-    "[W8-10] Time Limit 10": 793,
-    "[W8-10] Nonstop": 794,
+class Difficulty(Enum):
+    """Which difficulty's variant of a stage is being played."""
 
-    # W9-1
-    "[W9-1] Stage Clear": 801,
-    "[W9-1] Banana Collector 10": 802,
-    "[W9-1] Time Limit 15": 803,
-    "[W9-1] Green Goal": 804,
-    "[W9-1] Red Goal": 805,
-    # W9-2
-    "[W9-2] Stage Clear": 811,
-    "[W9-2] Banana Collector 20": 812,
-    "[W9-2] Time Limit 15": 813,
-    # W9-3
-    "[W9-3] Stage Clear": 821,
-    "[W9-3] Banana Collector 20": 822,
-    "[W9-3] Time Limit 15": 823,
-    # W9-4
-    "[W9-4] Stage Clear": 831,
-    "[W9-4] Banana Collector 20": 832,
-    "[W9-4] Time Limit 15": 833,
-    "[W9-4] Green Goal": 834,
-    # W9-5
-    "[W9-5] Stage Clear": 841,
-    "[W9-5] Banana Collector 20": 842,
-    "[W9-5] Time Limit 40": 843,
-    # W9-6
-    "[W9-6] Stage Clear": 851,
-    "[W9-6] Banana Collector 10": 852,
-    "[W9-6] Time Limit 30": 853,
-    # W9-7
-    "[W9-7] Stage Clear": 861,
-    "[W9-7] Banana Collector 12": 862,
-    "[W9-7] Time Limit 20": 863,
-    # W9-8
-    "[W9-8] Stage Clear": 871,
-    "[W9-8] Banana Collector 15": 872,
-    "[W9-8] Time Limit 10": 873,
-    # W9-9
-    "[W9-9] Stage Clear": 881,
-    "[W9-9] Banana Collector 14": 882,
-    "[W9-9] Time Limit 15": 883,
-    # W9-10
-    "[W9-10] Stage Clear": 891,
-    "[W9-10] Banana Collector 40": 892,
-    "[W9-10] Time Limit 20": 893,
+    STANDARD = "std"
+    INTERMEDIATE = "int"
+    EXPERT = "exp"
 
-    # W10-1
-    "[W10-1] Stage Clear": 901,
-    "[W10-1] Banana Collector 40": 902,
-    "[W10-1] Time Limit 10": 903,
-    # W10-2
-    "[W10-2] Stage Clear": 911,
-    "[W10-2] Banana Collector 30": 912,
-    "[W10-2] Time Limit 55": 913,
-    # W10-3
-    "[W10-3] Stage Clear": 921,
-    "[W10-3] Banana Collector 10": 922,
-    "[W10-3] Time Limit 10": 923,
-    # W10-4
-    "[W10-4] Stage Clear": 931,
-    "[W10-4] Banana Collector 25": 932,
-    "[W10-4] Time Limit 15": 933,
-    # W10-5
-    "[W10-5] Stage Clear": 941,
-    "[W10-5] Banana Collector 20": 942,
-    "[W10-5] Time Limit 30": 943,
-    # W10-6
-    "[W10-6] Stage Clear": 951,
-    "[W10-6] Banana Collector 20": 952,
-    "[W10-6] Time Limit 59": 953,
-    # W10-7
-    "[W10-7] Stage Clear": 961,
-    "[W10-7] Banana Collector 10": 962,
-    "[W10-7] Time Limit 45": 963,
-    # W10-8
-    "[W10-8] Stage Clear": 971,
-    "[W10-8] Banana Collector 10": 972,
-    "[W10-8] Time Limit 20": 973,
-    # W10-9
-    "[W10-9] Stage Clear": 981,
-    "[W10-9] Banana Collector 29": 982,
-    "[W10-9] Time Limit 50": 983,
-    # W10-10
-    "[W10-10] Stage Clear": 991,
-    "[W10-10] Banana Collector 25": 992,
-    "[W10-10] Time Limit 25": 993,
 
-    # Shop Locations
-    "Banana Shop Item 1": 1000,
-    "Banana Shop Item 2": 1001,
-    "Banana Shop Item 3": 1002,
-    "Banana Shop Item 4": 1003,
-    "Banana Shop Item 5": 1004,
-    "Banana Shop Item 6": 1005,
-    "Banana Shop Item 7": 1006,
-    "Banana Shop Item 8": 1007,
-    "Banana Shop Item 9": 1008,
-    "Banana Shop Item 10": 1009,
-    "Banana Shop Item 11": 1010,
-    "Banana Shop Item 12": 1011,
-    "Banana Shop Item 13": 1012,
-    "Banana Shop Item 14": 1013,
-    "Banana Shop Item 15": 1014,
-    "Banana Shop Item 16": 1015,
-    "Banana Shop Item 17": 1016,
-    "Banana Shop Item 18": 1017,
-    "Banana Shop Item 19": 1018,
-    "Banana Shop Item 20": 1019,
-    "Banana Shop Item 21": 1020,
-    "Banana Shop Item 22": 1021,
-    "Banana Shop Item 23": 1022,
-    "Banana Shop Item 24": 1023,
-    "Banana Shop Item 25": 1024,
-    "Banana Shop Item 26": 1025,
-    "Banana Shop Item 27": 1026,
-    "Banana Shop Item 28": 1027,
-    "Banana Shop Item 29": 1028,
-    "Banana Shop Item 30": 1029,
-    "Banana Shop Item 31": 1030,
-    "Banana Shop Item 32": 1031,
+class MissionKind(Enum):
+    """The kinds of check a stage can offer. The offset is added to the stage's base_id."""
 
+    CLEAR = ("Stage Clear", 0)
+    BANANAS = ("Banana Collector", 1)
+    TIME_LIMIT = ("Time Limit", 2)
+    GREEN_GOAL = ("Green Goal", 3)
+    RED_GOAL = ("Red Goal", 4)
+    NONSTOP = ("Nonstop", 5)
+
+    def __init__(self, label: str, offset: int) -> None:
+        self.label = label
+        self.offset = offset
+
+
+@dataclass(frozen=True)
+class Mission:
+    """0-10 seconds means under 10 seconds, so no items needed."""
+    seconds: int = 0                   # General time for the mission used for logic, also sets the baseline time limit time
+    seconds_int: int | None = None     # If set to none, inherits from seconds. Also is used for logic with time limit
+    seconds_exp: int | None = None     # If set to none, inherits from seconds_int, then seconds
+    amount: int | None = None          # bananas to collect, or seconds that must remain on the clock
+    items: Requirement = ()            # excludes time increases, as those are handled automatically
+    items_int: Requirement | None = None  # Inherits from standard items unless specified; () means none needed
+    items_exp: Requirement | None = None  # Inherits from items_int, then items
+
+
+@dataclass(frozen=True)
+class StageData:
+    base_id: int
+    name: str = ""                             # in-game stage name, e.g. "Simple"
+    clear: Mission = Mission()  # For clearing, green/red goals inherit from this unless specified otherwise
+    missions: dict[MissionKind, Mission] = field(default_factory=dict)
+    items: Requirement = ()                    # required by every mission on this stage
+    items_int: Requirement | None = None       # Inherits from standard items unless specified; () means none needed
+    items_exp: Requirement | None = None       # Inherits from items_int, then items
+
+    def all_missions(self) -> list[tuple[MissionKind, Mission]]:
+        """Every check this stage offers, in ID order. Stage Clear uses the Standard entry."""
+        return [(MissionKind.CLEAR, self.clear), *self.missions.items()]
+
+
+def resolve_items(source: Mission | StageData, difficulty: Difficulty = Difficulty.STANDARD) -> Requirement:
+    """The item requirement of one mission or stage on the given difficulty.
+
+    Expert falls back to Intermediate before Standard, so setting only ``items_int``
+    covers both of the harder difficulties.
+    """
+    if difficulty is Difficulty.EXPERT and source.items_exp is not None:
+        return source.items_exp
+    if difficulty in (Difficulty.INTERMEDIATE, Difficulty.EXPERT) and source.items_int is not None:
+        return source.items_int
+    return source.items
+
+
+def resolve_seconds(mission: Mission, difficulty: Difficulty = Difficulty.STANDARD) -> int:
+    """The time a mission needs on the given difficulty, with the same Expert -> Intermediate fallback."""
+    if difficulty is Difficulty.EXPERT and mission.seconds_exp is not None:
+        return mission.seconds_exp
+    if difficulty in (Difficulty.INTERMEDIATE, Difficulty.EXPERT) and mission.seconds_int is not None:
+        return mission.seconds_int
+    return mission.seconds
+
+
+def mission_items(
+    stage: StageData, mission: Mission, difficulty: Difficulty = Difficulty.STANDARD
+) -> Requirement:
+    """Everything needed for one check: the stage-wide items plus the mission's own."""
+    return (*resolve_items(stage, difficulty), *resolve_items(mission, difficulty))
+
+# Data collected from this sheet, big shoutout to Friday for gathering the logic: 
+# https://docs.google.com/spreadsheets/d/1xcdeANx_rk76uNjpTzSDubAzXn7za5Z9SlGcoUx4BC0/edit?usp=sharing
+
+# TODO:
+# Add item logic for green/red goals
+# Add logic for deluxe stages
+# Add logic for SMB1 Challenge Mode
+# Add logic for Reverse, Dark Banana, Golden Banana, Original Stages modes
+# Add logic for SMB1 Casual/Normal/Expert/Master
+
+STAGES: dict[str, StageData] = {
+    # World 1 - Jungle Island
+    "W1-1": StageData(1, name="Simple", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=10),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+    }),
+    "W1-2": StageData(11, name="Hollow", clear=Mission(seconds=18, seconds_int=0), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=30, seconds_int=20, seconds_exp=0),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+    }),
+    "W1-3": StageData(21, name="Bumpy", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=30, seconds=40, seconds_int=30, seconds_exp=30),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+    }),
+    "W1-4": StageData(31, name="Switches", clear=Mission(), items=("Normal Switches",), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=20, items=("Normal Switches",)),
+        MissionKind.TIME_LIMIT: Mission(amount=10, items=("Normal Switches",)),
+        MissionKind.GREEN_GOAL: Mission(items=("Normal Switches",)),
+    }),
+    "W1-5": StageData(41, name="Conveyors", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=30, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+        MissionKind.NONSTOP:    Mission(),
+    }),
+    "W1-6": StageData(51, name="Floaters", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=50, seconds=40, seconds_int=30, seconds_exp=30),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+    }),
+    "W1-7": StageData(61, name="Tub", clear=Mission(seconds=15, seconds_int=0), missions={
+        MissionKind.BANANAS:    Mission(amount=77, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+    }),
+    "W1-8": StageData(71, name="Windy Slide", clear=Mission(seconds=32, seconds_int=30, seconds_exp=20), missions={
+        MissionKind.BANANAS:    Mission(amount=70, seconds=40),
+        MissionKind.TIME_LIMIT: Mission(amount=30),
+        MissionKind.NONSTOP:    Mission(),
+    }),
+    "W1-9": StageData(81, name="Spinning Top", clear=Mission(seconds=14, seconds_int=11, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+    "W1-10": StageData(91, name="Curve Bridge", clear=Mission(seconds=34), missions={
+        MissionKind.BANANAS:    Mission(amount=60, seconds=40),
+        MissionKind.TIME_LIMIT: Mission(amount=35),
+    }),
+
+    # World 2 - Volcanic Magma
+    "W2-1": StageData(101, name="Banks", clear=Mission(seconds=15, seconds_int=0), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+    }),
+    "W2-2": StageData(111, name="Eaten Floor", clear=Mission(seconds=15, seconds_int=11, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=60),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+    "W2-3": StageData(121, name="Hoppers", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=ALL_BANANAS, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=5),
+    }),
+    "W2-4": StageData(131, name="Coaster", clear=Mission(seconds=23, seconds_int=22, seconds_exp=17), missions={
+        MissionKind.BANANAS:    Mission(amount=55, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=30),
+    }),
+    "W2-5": StageData(141, name="Bumpy Check", clear=Mission(seconds=13, seconds_int=12, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=40),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+    "W2-6": StageData(151, name="Swell", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+    }),
+    "W2-7": StageData(161, name="Gravity Slider", clear=Mission(seconds=19), missions={
+        MissionKind.BANANAS:    Mission(amount=70, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+    "W2-8": StageData(171, name="Inchworms", clear=Mission(seconds=12, seconds_int=12, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=30, seconds=40),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+        MissionKind.GREEN_GOAL: Mission(seconds=20, items=("Normal Switches",)),
+        MissionKind.RED_GOAL:   Mission(seconds=20, items=("Normal Switches",)),
+    }),
+    "W2-9": StageData(181, name="Totalitarianism", clear=Mission(seconds=12, seconds_int=12, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=15, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+        MissionKind.NONSTOP:    Mission(),
+    }),
+    "W2-10": StageData(191, name="Alternative", clear=Mission(seconds=21, seconds_int=14), items_int=("Fast Switches",), missions={
+        MissionKind.BANANAS:    Mission(amount=15, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+
+    # World 3 - Under the Ocean
+    "W3-1": StageData(201, name="Organic Form", clear=Mission(seconds=17), missions={
+        MissionKind.BANANAS:    Mission(amount=ALL_BANANAS, seconds=60),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+    "W3-2": StageData(211, name="Reversible Gear", clear=Mission(seconds=13), missions={
+        MissionKind.BANANAS:    Mission(amount=30, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+    "W3-3": StageData(221, name="Stepping Stones", clear=Mission(seconds=19), missions={
+        MissionKind.BANANAS:    Mission(amount=70, seconds=30, seconds_exp=20),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+    "W3-4": StageData(231, name="Dribbles", clear=Mission(seconds=48, seconds_int=34), missions={
+        MissionKind.BANANAS:    Mission(amount=ALL_BANANAS, seconds=60),
+        MissionKind.TIME_LIMIT: Mission(amount=40),
+        MissionKind.NONSTOP:    Mission(),
+    }),
+    "W3-5": StageData(241, name="Push Bar", clear=Mission(seconds=13, seconds_int=0), missions={
+        MissionKind.BANANAS:    Mission(amount=ALL_BANANAS, seconds=50),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+    "W3-6": StageData(251, name="Mad Rings", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=30, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=5),
+        MissionKind.GREEN_GOAL: Mission(),
+        MissionKind.RED_GOAL:   Mission(seconds=20),
+    }),
+    "W3-7": StageData(261, name="Curvy Options", clear=Mission(seconds=13), missions={
+        MissionKind.BANANAS:    Mission(amount=40, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+    "W3-8": StageData(271, name="Twist & Spin", clear=Mission(seconds=11, seconds_int=11, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=15, seconds=30, seconds_int=20, seconds_exp=20),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+    "W3-9": StageData(281, name="Cascade", clear=Mission(seconds=29, seconds_int=14, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=40),
+        MissionKind.TIME_LIMIT: Mission(amount=30),
+    }),
+    "W3-10": StageData(291, name="Junction", clear=Mission(seconds=13, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=38, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+        MissionKind.GREEN_GOAL: Mission(seconds=20),
+    }),
+
+    # World 4 - Inside a Whale
+    "W4-1": StageData(301, name="Pro Skaters", clear=Mission(), items=("Pause Switches",), items_int=(), items_exp=(), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=30, items=("Pause Switches",)),
+        MissionKind.TIME_LIMIT: Mission(amount=10, items=("Pause Switches",)),
+        MissionKind.GREEN_GOAL: Mission(items=("Pause Switches",)),
+    }),
+    "W4-2": StageData(311, name="Giant Comb", clear=Mission(seconds=28, seconds_int=12, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=15, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+        MissionKind.NONSTOP:    Mission(),
+    }),
+    "W4-3": StageData(321, name="Beehive", clear=Mission(seconds=27, seconds_int=13), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=60),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+    "W4-4": StageData(331, name="Dynamic Maze", clear=Mission(seconds=19, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=30, seconds=50),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+    "W4-5": StageData(341, name="Triangle Holes", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=30, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+        MissionKind.NONSTOP:    Mission(),
+    }),
+    "W4-6": StageData(351, name="Launchers", clear=Mission(seconds=28, seconds_int=18), missions={
+        MissionKind.BANANAS:    Mission(amount=10, seconds=50),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+        MissionKind.GREEN_GOAL: Mission(),
+    }),
+    "W4-7": StageData(361, name="Randomizer", clear=Mission(seconds=14, seconds_int=11, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=35, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+        MissionKind.GREEN_GOAL: Mission(),
+        MissionKind.RED_GOAL:   Mission(),
+    }),
+    "W4-8": StageData(371, name="Coin Slots", clear=Mission(seconds=26, seconds_int=11), missions={
+        MissionKind.BANANAS:    Mission(amount=ALL_BANANAS, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=30),
+        MissionKind.GREEN_GOAL: Mission(),
+    }),
+    "W4-9": StageData(381, name="Seesaw Bridges", clear=Mission(seconds=48, seconds_int=38, seconds_exp=29), missions={
+        MissionKind.BANANAS:    Mission(amount=40, seconds=50),
+        MissionKind.TIME_LIMIT: Mission(amount=55),
+    }),
+    "W4-10": StageData(391, name="Arthropod", clear=Mission(seconds=12), missions={
+        MissionKind.BANANAS:    Mission(amount=ALL_BANANAS, seconds=50),
+        MissionKind.TIME_LIMIT: Mission(amount=30),
+    }),
+
+    # World 5 - Amusement Park
+    "W5-1": StageData(401, name="Wormhole", clear=Mission(seconds=22, seconds_int=19), items=("Wormholes",), missions={
+        MissionKind.BANANAS:    Mission(amount=50, seconds=40, items=("Wormholes",)),
+        MissionKind.TIME_LIMIT: Mission(amount=25, items=("Wormholes",)),
+        MissionKind.NONSTOP:    Mission(),
+    }),
+    "W5-2": StageData(411, name="Free Fall", clear=Mission(seconds=18, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=50, seconds=50),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+        MissionKind.GREEN_GOAL: Mission(),
+    }),
+    "W5-3": StageData(421, name="Melting Pot", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=10),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+    "W5-4": StageData(431, name="Mad Shuffle", clear=Mission(), items=("Wormholes",), missions={
+        MissionKind.BANANAS:    Mission(amount=ALL_BANANAS, seconds=50, items=("Normal Switches", "Wormholes")),
+        MissionKind.TIME_LIMIT: Mission(amount=10, items=("Normal Switches", "Wormholes")),
+    }),
+    "W5-5": StageData(441, name="Bead Screen", clear=Mission(seconds=14, seconds_int=0), items=("Pause Switches",), items_int=(), items_exp=(), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=20, items=("Pause Switches",)),
+        MissionKind.TIME_LIMIT: Mission(amount=15, items=("Pause Switches",)),
+    }),
+    "W5-6": StageData(451, name="Jump Machine", clear=Mission(seconds=12), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=40),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+        MissionKind.GREEN_GOAL: Mission(),
+        MissionKind.RED_GOAL:   Mission(),
+    }),
+    "W5-7": StageData(461, name="Zigzag Slope", clear=Mission(seconds=17), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+    "W5-8": StageData(471, name="Tower", clear=Mission(seconds=12), items=("Wormholes",), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=20, items=("Wormholes",)),
+        MissionKind.TIME_LIMIT: Mission(amount=15, items=("Wormholes",)),
+    }),
+    "W5-9": StageData(481, name="Toggle", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=ALL_BANANAS, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+    }),
+    "W5-10": StageData(491, name="Fluctuation", clear=Mission(seconds=15, seconds_int=0), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=40),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+
+    # World 6 - Boiling Pot
+    "W6-1": StageData(501, name="Combination", clear=Mission(seconds=25, seconds_int=0), items=("Wormholes", "Normal Switches"), items_int=("Wormholes",), items_exp=("Wormholes",), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=50, items=("Wormholes", "Normal Switches")),
+        MissionKind.TIME_LIMIT: Mission(amount=10, items=("Wormholes", "Normal Switches")),
+    }),
+    "W6-2": StageData(511, name="Punched Seesaws", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=21, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+        MissionKind.GREEN_GOAL: Mission(),
+    }),
+    "W6-3": StageData(521, name="Opera", clear=Mission(seconds=45, seconds_int=34, seconds_exp=29), missions={
+        MissionKind.BANANAS:    Mission(amount=70, seconds=60),
+        MissionKind.TIME_LIMIT: Mission(amount=35),
+    }),
+    "W6-4": StageData(531, name="Brandished", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=35, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=5),
+    }),
+    "W6-5": StageData(541, name="Tiers", clear=Mission(seconds=16), items=("Wormholes",), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=40, items=("Wormholes",)),
+        MissionKind.TIME_LIMIT: Mission(amount=30, items=("Wormholes",)),
+        MissionKind.GREEN_GOAL: Mission(items=("Wormholes",)),
+        MissionKind.RED_GOAL:   Mission(items=("Wormholes",)),
+    }),
+    "W6-6": StageData(551, name="Cliffs", clear=Mission(seconds=29, seconds_int=19, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=30),
+    }),
+    "W6-7": StageData(561, name="Narrow Peaks", clear=Mission(seconds=17, seconds_int=0), missions={
+        MissionKind.BANANAS:    Mission(amount=15, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+    "W6-8": StageData(571, name="Detours", clear=Mission(seconds=11, seconds_int=0), items=("Wormholes",), items_int=("Wormholes",), items_exp=(), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=20, items=("Wormholes",)),
+        MissionKind.TIME_LIMIT: Mission(amount=15, items=("Wormholes",)),
+        MissionKind.GREEN_GOAL: Mission(items=("Wormholes",)),
+    }),
+    # TODO: source data lists "Play Switch" for the banana mission; there is no such item in items.py yet.
+    "W6-9": StageData(581, name="Switch Inferno", clear=Mission(), items=("Normal Switches",), missions={
+        MissionKind.BANANAS:    Mission(amount=9, items=("Normal Switches",)),
+        MissionKind.TIME_LIMIT: Mission(amount=15, items=("Normal Switches",)),
+    }),
+    "W6-10": StageData(591, name="Folders", clear=Mission(seconds=13), missions={
+        MissionKind.BANANAS:    Mission(amount=10, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+
+    # World 7 - Bubbly Washing Machine
+    "W7-1": StageData(601, name="Spiral Bridge", clear=Mission(seconds=19), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+    "W7-2": StageData(611, name="Wavy Option", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+        MissionKind.NONSTOP:    Mission(),
+    }),
+    "W7-3": StageData(621, name="Obstacle", clear=Mission(seconds=19), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+    "W7-4": StageData(631, name="Domino", clear=Mission(seconds=11, seconds_int=0), items=("Normal Switches",), items_int=("Normal Switches",), items_exp=(), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=30, items=("Normal Switches",)),
+        MissionKind.TIME_LIMIT: Mission(amount=15, items=("Normal Switches",)),
+    }),
+    "W7-5": StageData(641, name="Sieve", clear=Mission(seconds=28), missions={
+        MissionKind.BANANAS:    Mission(amount=15, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=30),
+        MissionKind.NONSTOP:    Mission(),
+    }),
+    "W7-6": StageData(651, name="Flock", clear=Mission(seconds=49, seconds_int=19, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=15, seconds=60),
+        MissionKind.TIME_LIMIT: Mission(amount=50),
+    }),
+    "W7-7": StageData(661, name="Double Spiral", clear=Mission(seconds=19), missions={
+        MissionKind.BANANAS:    Mission(amount=10, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=25),
+    }),
+    "W7-8": StageData(671, name="Hierarchy", clear=Mission(seconds=24, seconds_int=0), missions={
+        MissionKind.BANANAS:    Mission(amount=15, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=25),
+    }),
+    "W7-9": StageData(681, name="8 Bracelets", clear=Mission(seconds=21), missions={
+        MissionKind.BANANAS:    Mission(amount=10, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=25),
+        MissionKind.GREEN_GOAL: Mission(),
+        MissionKind.RED_GOAL:   Mission(),
+    }),
+    "W7-10": StageData(691, name="Quick Turn", clear=Mission(), items=("Fast Switches",), missions={
+        MissionKind.BANANAS:    Mission(amount=ALL_BANANAS),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+        MissionKind.NONSTOP:    Mission(),
+    }),
+
+    # World 8 - Clock Tower Factory
+    "W8-1": StageData(701, name="Pistons", clear=Mission(seconds=27, seconds_int=16), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+    "W8-2": StageData(711, name="Soft Cream", clear=Mission(seconds=17, seconds_int=13, seconds_exp=0), items=("Normal Switches",), items_int=(AnyOf("Normal Switches", "Fast Switches"),), items_exp=(AnyOf("Normal Switches", "Fast Switches"),), missions={
+        MissionKind.BANANAS:    Mission(amount=16, seconds=20, items=("Normal Switches",)),
+        MissionKind.TIME_LIMIT: Mission(amount=20, items=("Normal Switches",)),
+    }),
+    "W8-3": StageData(721, name="Momentum", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=21, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+    }),
+    "W8-4": StageData(731, name="Entangled Path", clear=Mission(seconds=41, seconds_int=31, seconds_exp=30), items=("Normal Switches", "Fast Switches"), items_int=("Normal Switches", "Fast Switches"), items_exp=(), missions={
+        MissionKind.BANANAS:    Mission(amount=30, seconds=50, items=("Normal Switches", "Fast Switches")),
+        MissionKind.TIME_LIMIT: Mission(amount=40, items=("Normal Switches", "Fast Switches")),
+        MissionKind.GREEN_GOAL: Mission(items=("Normal Switches", "Fast Switches")),
+    }),
+    "W8-5": StageData(741, name="Totters", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=28),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+    }),
+    "W8-6": StageData(751, name="Vortex", clear=Mission(seconds=27, seconds_int=18), missions={
+        MissionKind.BANANAS:    Mission(amount=10, seconds=40),
+        MissionKind.TIME_LIMIT: Mission(amount=30),
+        MissionKind.GREEN_GOAL: Mission(),
+    }),
+    "W8-7": StageData(761, name="Warp", clear=Mission(seconds=27), missions={
+        MissionKind.BANANAS:    Mission(amount=10, seconds=50),
+        MissionKind.TIME_LIMIT: Mission(amount=40),
+        MissionKind.GREEN_GOAL: Mission(),
+    }),
+    "W8-8": StageData(771, name="Trampolines", clear=Mission(seconds=29, seconds_int=16), missions={
+        MissionKind.BANANAS:    Mission(amount=40, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=30),
+    }),
+    "W8-9": StageData(781, name="Swing Shaft", clear=Mission(seconds=26, seconds_int=14), missions={
+        MissionKind.BANANAS:    Mission(amount=10, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=30),
+    }),
+    "W8-10": StageData(791, name="Linear Seesaws", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=10, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+        MissionKind.NONSTOP:    Mission(),
+    }),
+
+    # World 9 - Space Colony
+    "W9-1": StageData(801, name="Serial Jump", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=10, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+        MissionKind.GREEN_GOAL: Mission(),
+        MissionKind.RED_GOAL:   Mission(),
+    }),
+    "W9-2": StageData(811, name="Cross Floors", clear=Mission(seconds=14), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+    "W9-3": StageData(821, name="Spinning Saw", clear=Mission(seconds=25, seconds_int=0), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+    "W9-4": StageData(831, name="Chipped Pipes", clear=Mission(seconds=15, seconds_int=0), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+        MissionKind.GREEN_GOAL: Mission(),
+    }),
+    "W9-5": StageData(841, name="Flat Maze", clear=Mission(seconds=56, seconds_int=39, seconds_exp=22), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=60),
+        MissionKind.TIME_LIMIT: Mission(amount=40),
+    }),
+    "W9-6": StageData(851, name="Guillotine", clear=Mission(seconds=25, seconds_exp=19), missions={
+        MissionKind.BANANAS:    Mission(amount=10, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=30),
+    }),
+    "W9-7": StageData(861, name="Cork Screw", clear=Mission(seconds=18), missions={
+        MissionKind.BANANAS:    Mission(amount=12, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+    "W9-8": StageData(871, name="Orbiters", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=15, seconds=20),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+    }),
+    "W9-9": StageData(881, name="Twin Basin", clear=Mission(seconds=15, seconds_int=0), missions={
+        MissionKind.BANANAS:    Mission(amount=14, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+    "W9-10": StageData(891, name="Air Hockey", clear=Mission(seconds=19, seconds_int=0), missions={
+        MissionKind.BANANAS:    Mission(amount=40, seconds=40),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+
+    # World 10 - Dr. Bad-Boon's Base
+    "W10-1": StageData(901, name="Training", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=40, seconds=40),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+    }),
+    "W10-2": StageData(911, name="Gimmick", clear=Mission(seconds=54, seconds_int=48), items=("Normal Switches",), items_int=("Normal Switches",), items_exp=("Normal Switches",), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=60, items=("Normal Switches",)),
+        MissionKind.TIME_LIMIT: Mission(amount=55, items=("Normal Switches",)),
+    }),
+    "W10-3": StageData(921, name="Mountain", clear=Mission(), missions={
+        MissionKind.BANANAS:    Mission(amount=10),
+        MissionKind.TIME_LIMIT: Mission(amount=10),
+    }),
+    "W10-4": StageData(931, name="Disorder", clear=Mission(seconds=25, seconds_int=12, seconds_exp=0), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=15),
+    }),
+    "W10-5": StageData(941, name="3D Maze", clear=Mission(seconds=22, seconds_int=19), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=30),
+        MissionKind.TIME_LIMIT: Mission(amount=30),
+    }),
+    "W10-6": StageData(951, name="Crazy Maze", clear=Mission(seconds=55, seconds_int=48), missions={
+        MissionKind.BANANAS:    Mission(amount=20, seconds=60),
+        MissionKind.TIME_LIMIT: Mission(amount=59),
+    }),
+    "W10-7": StageData(961, name="Post Modern", clear=Mission(seconds=46, seconds_int=38), missions={
+        MissionKind.BANANAS:    Mission(amount=10, seconds=50),
+        MissionKind.TIME_LIMIT: Mission(amount=45),
+    }),
+    "W10-8": StageData(971, name="Revolution", clear=Mission(seconds=19), missions={
+        MissionKind.BANANAS:    Mission(amount=10, seconds=40),
+        MissionKind.TIME_LIMIT: Mission(amount=20),
+    }),
+    "W10-9": StageData(981, name="Invisible", clear=Mission(seconds=55, seconds_int=47), items=("Normal Switches",), missions={
+        MissionKind.BANANAS:    Mission(amount=29, seconds=60, items=("Normal Switches",)),
+        MissionKind.TIME_LIMIT: Mission(amount=50, items=("Normal Switches",)),
+    }),
+    "W10-10": StageData(991, name="Last Stage", clear=Mission(seconds=25), items=("Normal Switches",), missions={
+        MissionKind.BANANAS:    Mission(amount=25, seconds=30, items=("Normal Switches",)),
+        MissionKind.TIME_LIMIT: Mission(amount=25, items=("Normal Switches",)),
+    }),
+}
+
+SHOP_LOCATION_NAME_TO_ID: dict[str, int] = {
+    f"Banana Shop Item {n}": 999 + n for n in range(1, 33)
 }
 
 
-# Each Location instance must correctly report the "game" it belongs to.
-# To make this simple, it is common practice to subclass the basic Location class and override the "game" field.
 class BananaManiaLocation(Location):
     game = "Super Monkey Ball Banana Mania"
 
 
-# Let's make one more helper method before we begin actually creating locations.
-# Later on in the code, we'll want specific subsections of LOCATION_NAME_TO_ID.
-# To reduce the chance of copy-paste errors writing something like {"Chest": LOCATION_NAME_TO_ID["Chest"]},
-# let's make a helper method that takes a list of location names and returns them as a dict with their IDs.
-# Note: There is a minor typing quirk here. Some functions want location addresses to be an "int | None",
-# so while our function here only ever returns dict[str, int], we annotate it as dict[str, int | None].
+def location_name(stage_id: str, stage: StageData, kind: MissionKind, mission: Mission) -> str:
+    """Build the display name for one of a stage's checks."""
+    prefix = f"[{stage_id}] {stage.name} -" if stage.name else f"[{stage_id}]"
+
+    if kind is MissionKind.BANANAS and mission.amount == ALL_BANANAS:
+        return f"{prefix} Banana Complete"
+    if mission.amount is not None:
+        return f"{prefix} {kind.label} {mission.amount}"
+    return f"{prefix} {kind.label}"
+
+
+LOCATION_NAME_TO_ID: dict[str, int] = {
+    **{
+        location_name(stage_id, stage, kind, mission): stage.base_id + kind.offset
+        for stage_id, stage in STAGES.items()
+        for kind, mission in stage.all_missions()
+    },
+    **SHOP_LOCATION_NAME_TO_ID,
+}
+
+
 def get_location_names_with_ids(location_names: list[str]) -> dict[str, int | None]:
     return {location_name: LOCATION_NAME_TO_ID[location_name] for location_name in location_names}
 
@@ -518,36 +624,34 @@ def create_all_locations(world: BananaManiaWorld) -> None:
     create_events(world)
 
 
-def _include_location(name: str, world: BananaManiaWorld) -> bool:
-    """Return True if this stage location should be created given the current options."""
-    if "Stage Clear" in name:
-        return True
-    if ("Banana Collector" in name or "Banana Complete" in name) and not world.options.banana_missions:
-        return False
-    if "Time Limit" in name and not world.options.time_missions:
-        return False
-    if ("Green Goal" in name or "Red Goal" in name or "Nonstop" in name) and not world.options.extra_goals:
-        return False
+def _include_mission(kind: MissionKind, world: BananaManiaWorld) -> bool:
+    """Return True if this kind of check should be created given the current options."""
+    if kind is MissionKind.BANANAS:
+        return bool(world.options.banana_missions)
+    if kind is MissionKind.TIME_LIMIT:
+        return bool(world.options.time_missions)
+    if kind in (MissionKind.GREEN_GOAL, MissionKind.RED_GOAL):
+        return bool(world.options.extra_goals)
+    if kind in (MissionKind.NONSTOP):
+        return bool(world.options.nonstop_missions)
     return True
 
 
 def create_regular_locations(world: BananaManiaWorld) -> None:
     # Group stage locations by world number (W1 through W10).
     for world_num in range(1, 11):
-        prefix = f"[W{world_num}-"
+        prefix = f"W{world_num}-"
         region = world.get_region(f"World {world_num}")
-        stage_locations = get_location_names_with_ids(
-            [name for name in LOCATION_NAME_TO_ID
-             if name.startswith(prefix) and _include_location(name, world)]
-        )
+        stage_locations = get_location_names_with_ids([
+            location_name(stage_id, stage, kind, mission)
+            for stage_id, stage in STAGES.items() if stage_id.startswith(prefix)
+            for kind, mission in stage.all_missions() if _include_mission(kind, world)
+        ])
         region.add_locations(stage_locations, BananaManiaLocation)
 
     # Banana Shop locations.
     banana_shop = world.get_region("Banana Shop")
-    shop_locations = get_location_names_with_ids(
-        [name for name in LOCATION_NAME_TO_ID if name.startswith("Banana Shop Item")]
-    )
-    banana_shop.add_locations(shop_locations, BananaManiaLocation)
+    banana_shop.add_locations(dict(SHOP_LOCATION_NAME_TO_ID), BananaManiaLocation)
 
 
 def create_events(world: BananaManiaWorld) -> None:

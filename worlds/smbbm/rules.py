@@ -4,7 +4,11 @@ import math
 import re
 from typing import TYPE_CHECKING
 
+from .locations import AnyOf, Requirement
+
 if TYPE_CHECKING:
+    from BaseClasses import CollectionState
+
     from .world import BananaManiaWorld
 
 # Maps world number (1-10) to its individual unlock item name.
@@ -20,6 +24,17 @@ WORLD_UNLOCK_NAMES = [
     "Space Colony Unlock",            # World 9
     "Dr. Bad-Boon's Base Unlock",     # World 10
 ]
+
+
+def has_requirement(state: CollectionState, player: int, requirement: Requirement) -> bool:
+    """True when every term of the requirement is satisfied. AnyOf terms need one alternative."""
+    return all(_has_term(state, player, term) for term in requirement)
+
+
+def _has_term(state: CollectionState, player: int, term: str | AnyOf) -> bool:
+    if isinstance(term, AnyOf):
+        return any(has_requirement(state, player, alt) for alt in term.alternatives)
+    return state.has(term, player)
 
 
 def set_all_rules(world: BananaManiaWorld) -> None:

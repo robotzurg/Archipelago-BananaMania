@@ -7,9 +7,6 @@ from BaseClasses import Item, ItemClassification
 if TYPE_CHECKING:
     from .world import BananaManiaWorld
 
-# Every item must have a unique integer ID associated with it.
-# We will have a lookup from item name to ID here that, in world.py, we will import and bind to the world class.
-# Even if an item doesn't exist on specific options, it must be present in this lookup.
 ITEM_NAME_TO_ID = {
     "Progressive World Unlock": 1,
     "Jungle Island Unlock": 2,
@@ -22,31 +19,32 @@ ITEM_NAME_TO_ID = {
     "Clock Tower Factory Unlock": 9,
     "Space Colony Unlock": 10,
     "Dr. Bad-Boon's Base Unlock": 11,
-    "Switches": 12,
-    "Wormholes": 13,
-    "Progressive Time Increase": 14,
-    "+10 Time Bonus": 15,
-    "+20 Time Bonus": 16,
-    "+30 Time Bonus": 17,
-    "10 Banana Points": 18,
-    "100 Banana Points": 19,
-    "1000 Banana Points": 20,
-    "AiAi": 21,
-    "MeeMee": 22,
-    "Baby": 23,
-    "GonGon": 24,
-    "YanYan": 25,
-    "Doctor": 26,
-    "Jam": 27,
-    "Jet": 28,
-    "Sonic": 29,
-    "Tails": 30,
-    "Beat": 31,
-    "Kiryu": 32,
+    "Normal Switches": 20,
+    "Wormholes": 21,
+    "Fast Switches": 22,
+    "Pause Switches": 23,
+    "Progressive Time Increase": 30,
+    "+10 Time Bonus": 31,
+    "+20 Time Bonus": 32,
+    "+30 Time Bonus": 33,
+    "10 Banana Points": 40,
+    "100 Banana Points": 41,
+    "1000 Banana Points": 42,
+    "AiAi": 50,
+    "MeeMee": 51,
+    "Baby": 52,
+    "GonGon": 53,
+    "YanYan": 54,
+    "Doctor": 55,
+    "Jam": 56,
+    "Jet": 57,
+    "Sonic": 58,
+    "Tails": 59,
+    "Beat": 60,
+    "Kiryu": 61,
+    "Progressive Shop Stock": 100
 }
 
-# Items should have a defined default classification.
-# In our case, we will make a dictionary from item name to classification.
 DEFAULT_ITEM_CLASSIFICATIONS = {
     "Progressive World Unlock": ItemClassification.progression,
     "Jungle Island Unlock": ItemClassification.progression,
@@ -82,34 +80,17 @@ DEFAULT_ITEM_CLASSIFICATIONS = {
     "Kiryu": ItemClassification.filler,
 }
 
-
-# Each Item instance must correctly report the "game" it belongs to.
-# To make this simple, it is common practice to subclass the basic Item class and override the "game" field.
 class BananaManiaItem(Item):
     game = "Super Monkey Ball Banana Mania"
 
-
-# Ontop of our regular itempool, our world must be able to create arbitrary amounts of filler as requested by core.
-# To do this, it must define a function called world.get_filler_item_name(), which we will define in world.py later.
-# For now, let's make a function that returns the name of a random filler item here in items.py.
 def get_random_filler_item_name(world: BananaManiaWorld) -> str:
     return "10 Banana Points"
 
-
 def create_item_with_correct_classification(world: BananaManiaWorld, name: str) -> BananaManiaItem:
-    # Our world class must have a create_item() function that can create any of our items by name at any time.
-    # So, we make this helper function that creates the item by name with the correct classification.
-    # Note: This function's content could just be the contents of world.create_item in world.py directly,
-    # but it seemed nicer to have it in its own function over here in items.py.
     classification = DEFAULT_ITEM_CLASSIFICATIONS[name]
-
-    # It is perfectly normal and valid for an item's classification to differ based on the player's options.
-    # Not currently used in Banana Mania
-
     return BananaManiaItem(name, classification, ITEM_NAME_TO_ID[name], world.player)
 
 
-# With those two helper functions defined, let's now get to actually creating and submitting our itempool.
 INDIVIDUAL_WORLD_UNLOCKS = [
     "Jungle Island Unlock",
     "Volcanic Magma Unlock",
