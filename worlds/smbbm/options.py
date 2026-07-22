@@ -25,10 +25,10 @@ class IncludeExtraGoals(Toggle):
 
 class IncludeNonstopMissions(Toggle):
     """
-    Include the Deluxe Stages in logic.
+    Include the Nonstop missions as checks. These are more difficult.
     """
 
-    display_name = "Deluxe Stages"
+    display_name = "Nonstop Missions"
 
 class WorldStructure(Choice):
     """
