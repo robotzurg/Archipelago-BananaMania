@@ -88,11 +88,7 @@ class StageData:
 
 
 def resolve_items(source: Mission | StageData, difficulty: Difficulty = Difficulty.STANDARD) -> Requirement:
-    """The item requirement of one mission or stage on the given difficulty.
-
-    Expert falls back to Intermediate before Standard, so setting only ``items_int``
-    covers both of the harder difficulties.
-    """
+    """The item requirement of one mission or stage on the given difficulty."""
     if difficulty is Difficulty.EXPERT and source.items_exp is not None:
         return source.items_exp
     if difficulty in (Difficulty.INTERMEDIATE, Difficulty.EXPERT) and source.items_int is not None:
@@ -115,7 +111,7 @@ def mission_items(
     """Everything needed for one check: the stage-wide items plus the mission's own."""
     return (*resolve_items(stage, difficulty), *resolve_items(mission, difficulty))
 
-# Data collected from this sheet, big shoutout to Friday for gathering the logic: 
+# Data collected from this sheet, big shoutout to Friday and their friend for gathering the logic: 
 # https://docs.google.com/spreadsheets/d/1xcdeANx_rk76uNjpTzSDubAzXn7za5Z9SlGcoUx4BC0/edit?usp=sharing
 
 # TODO:
@@ -585,9 +581,9 @@ STAGES: dict[str, StageData] = {
     }),
 }
 
-SHOP_LOCATION_NAME_TO_ID: dict[str, int] = {
-    f"Banana Shop Item {n}": 999 + n for n in range(1, 33)
-}
+# SHOP_LOCATION_NAME_TO_ID: dict[str, int] = {
+#     f"Banana Shop Item {n}": 999 + n for n in range(1, 33)
+# }
 
 
 class BananaManiaLocation(Location):
@@ -611,7 +607,7 @@ LOCATION_NAME_TO_ID: dict[str, int] = {
         for stage_id, stage in STAGES.items()
         for kind, mission in stage.all_missions()
     },
-    **SHOP_LOCATION_NAME_TO_ID,
+    # **SHOP_LOCATION_NAME_TO_ID,
 }
 
 
@@ -650,8 +646,8 @@ def create_regular_locations(world: BananaManiaWorld) -> None:
         region.add_locations(stage_locations, BananaManiaLocation)
 
     # Banana Shop locations.
-    banana_shop = world.get_region("Banana Shop")
-    banana_shop.add_locations(dict(SHOP_LOCATION_NAME_TO_ID), BananaManiaLocation)
+    # banana_shop = world.get_region("Banana Shop")
+    # banana_shop.add_locations(dict(SHOP_LOCATION_NAME_TO_ID), BananaManiaLocation)
 
 
 def create_events(world: BananaManiaWorld) -> None:

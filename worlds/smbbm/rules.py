@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 import re
 from typing import TYPE_CHECKING
+from rule_builder.rules import Has
 
 from .locations import AnyOf, Requirement
 
@@ -11,7 +12,6 @@ if TYPE_CHECKING:
 
     from .world import BananaManiaWorld
 
-# Maps world number (1-10) to its individual unlock item name.
 WORLD_UNLOCK_NAMES = [
     "Jungle Island Unlock",           # World 1
     "Volcanic Magma Unlock",          # World 2
@@ -47,34 +47,25 @@ def set_all_entrance_rules(world: BananaManiaWorld) -> None:
     for world_num in range(1, 11):
         entrance = world.get_entrance(f"Overworld to World {world_num}")
         if world.options.world_structure == 0:  # progression
-            # Each world N requires N "Progressive World Unlock" items.
-            entrance.access_rule = (
-                lambda state, n=world_num: state.has("Progressive World Unlock", world.player, n)
-            )
-        else:  # worlds — each world has its own specific unlock
+            world.set_rule(entrance, Has("Progressive World Unlock", world_num))
+        else:  # individual
             unlock_name = WORLD_UNLOCK_NAMES[world_num - 1]
-            entrance.access_rule = (
-                lambda state, name=unlock_name: state.has(name, world.player)
-            )
+            world.set_rule(entrance, Has(unlock_name))
 
 
 def set_all_location_rules(world: BananaManiaWorld) -> None:
     for location in world.multiworld.get_locations(world.player):
         name = location.name
 
-        # Time Limit missions require enough Progressive Time Increases.
-        # The player starts with 10 seconds; each upgrade adds 10 seconds (max 60s).
-        # Formula: upgrades_needed = ceil((limit - 10) / 10)
+        # Time Limit logic, you start with 10 seconds
         time_match = re.search(r"Time Limit (\d+)", name)
         if time_match:
             limit = int(time_match.group(1))
             upgrades = math.ceil((limit - 10) / 10)
             if upgrades > 0:
-                location.access_rule = (
-                    lambda state, n=upgrades: state.has("Progressive Time Increase", world.player, n)
-                )
+                world.set_rule(location, Has("Progressive Time Increase", upgrades))
             continue
 
 
 def set_completion_condition(world: BananaManiaWorld) -> None:
-    world.multiworld.completion_condition[world.player] = lambda state: state.has("Victory", world.player)
+    world.set_completion_rule(Has("Victory"))

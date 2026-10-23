@@ -41,4 +41,4 @@ def connect_regions(world: BananaManiaWorld) -> None:
     for region_name in WORLD_REGIONS:
         overworld.connect(world.get_region(region_name), f"Overworld to {region_name}")
 
-    overworld.connect(world.get_region("Banana Shop"), "Overworld to Banana Shop")
+    # overworld.connect(world.get_region("Banana Shop"), "Overworld to Banana Shop")
