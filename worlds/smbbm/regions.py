@@ -18,6 +18,19 @@ WORLD_REGIONS = [
     "World 8",
     "World 9",
     "World 10",
+    "SMB1 Challenge Mode Casual",
+    "SMB1 Challenge Mode Normal",
+    "SMB1 Challenge Mode Expert",
+    "SMB1 Challenge Mode Master",
+    "SMB2 Challenge Mode Casual",
+    "SMB2 Challenge Mode Normal",
+    "SMB2 Challenge Mode Expert",
+    "SMB2 Challenge Mode Master",
+    "Deluxe Mode",
+    "Reverse Mode",
+    "Dark Banana Mode",
+    "Golden Banana Mode",
+    "Original Stages Mode"
 ]
 
 
@@ -27,18 +40,13 @@ def create_and_connect_regions(world: BananaManiaWorld) -> None:
 
 
 def create_all_regions(world: BananaManiaWorld) -> None:
-    overworld = Region("Overworld", world.player, world.multiworld)
-
-    stage_regions = [Region(name, world.player, world.multiworld) for name in WORLD_REGIONS]
-    banana_shop = Region("Banana Shop", world.player, world.multiworld)
-
-    world.multiworld.regions += [overworld, *stage_regions, banana_shop]
+    overworld = Region("Menu", world.player, world.multiworld)
+    regions = [Region(name, world.player, world.multiworld) for name in WORLD_REGIONS]
+    world.multiworld.regions += [overworld, *regions]
 
 
 def connect_regions(world: BananaManiaWorld) -> None:
-    overworld = world.get_region("Overworld")
+    overworld = world.get_region("Menu")
 
     for region_name in WORLD_REGIONS:
-        overworld.connect(world.get_region(region_name), f"Overworld to {region_name}")
-
-    # overworld.connect(world.get_region("Banana Shop"), "Overworld to Banana Shop")
+        overworld.connect(world.get_region(region_name), f"Menu to {region_name}")

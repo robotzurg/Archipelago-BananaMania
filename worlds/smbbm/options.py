@@ -43,6 +43,25 @@ class WorldStructure(Choice):
     option_worlds = 1
 
     default = option_progression
+
+class LogicDifficulty(Choice):
+    """
+    The difficulty of logic for beating levels. In the discord channel pins you can find a
+    spreadsheet detailing all the specifics of how each of these affects the difficulty of beating levels,
+    but in general you can assume that:
+
+    Standard: Dev intended or very obvious skip routes that require minimal difficulty (recommended for most players)
+    Intermediate: Some skips required, nothing absurd, but trickier, good if you are good at Super Monkey Ball
+    Expert: Very hard tricks and skips fully required to beat levels really fast, VERY hard on some levels and still being refined
+    """
+
+    display_name = "Logic Difficulty"
+
+    option_standard = 0
+    option_intermediate = 1
+    option_expert = 2
+
+    default = option_standard
     
 class Smb1CasualChallengeMode(DefaultOnToggle):
     """
@@ -166,6 +185,7 @@ class BananaManiaOptions(PerGameCommonOptions):
     extra_goals: IncludeExtraGoals
     nonstop_missions: IncludeNonstopMissions
     world_structure: WorldStructure
+    logic_difficulty: LogicDifficulty
     smb1_casual: Smb1CasualChallengeMode
     smb1_normal: Smb1NormalChallengeMode
     smb1_expert: Smb1ExpertChallengeMode
@@ -188,15 +208,15 @@ option_groups = [
     ),
     OptionGroup(
         "Challenge Mode Options",
-        [Smb1CasualChallengeMode, Smb1NormalChallengeMode, Smb1ExpertChallengeMode, Smb1MasterChallengeMode
+        [Smb1CasualChallengeMode, Smb1NormalChallengeMode, Smb1ExpertChallengeMode, Smb1MasterChallengeMode,
          Smb2CasualExChallengeMode, Smb2NormalExChallengeMode, Smb2ExpertExChallengeMode, Smb2MasterExChallengeMode]
     ),
     OptionGroup(
         "Special Mode Options",
         [ReverseModeStages, DarkBananaStages, GoldenBananaStages, OriginalStagesMode]
-    )
+    ),
     OptionGroup(
-        "Item Options",
-        [WorldStructure, DeluxeUnlockStyle],
+        "Extra Options",
+        [WorldStructure, DeluxeUnlockStyle, LogicDifficulty],
     ),
 ]

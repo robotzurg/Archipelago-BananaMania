@@ -12,17 +12,18 @@ if TYPE_CHECKING:
 
     from .world import BananaManiaWorld
 
-WORLD_UNLOCK_NAMES = [
-    "Jungle Island Unlock",           # World 1
-    "Volcanic Magma Unlock",          # World 2
-    "Under the Ocean Unlock",         # World 3
-    "Inside a Whale Unlock",          # World 4
-    "Amusement Park Unlock",          # World 5
-    "Boiling Pot Unlock",             # World 6
-    "Bubbly Washing Machine Unlock",  # World 7
-    "Clock Tower Factory Unlock",     # World 8
-    "Space Colony Unlock",            # World 9
-    "Dr. Bad-Boon's Base Unlock",     # World 10
+STAGE_UNLOCK_NAMES = [
+    "World 1: Jungle Island Unlock",           # World 1
+    "World 2: Volcanic Magma Unlock",          # World 2
+    "World 3: Under the Ocean Unlock",         # World 3
+    "World 4: Inside a Whale Unlock",          # World 4
+    "World 5: Amusement Park Unlock",          # World 5
+    "World 6: Boiling Pot Unlock",             # World 6
+    "World 7: Bubbly Washing Machine Unlock",  # World 7
+    "World 8: Clock Tower Factory Unlock",     # World 8
+    "World 9: Space Colony Unlock",            # World 9
+    "World 10: Dr. Bad-Boon's Base Unlock",     # World 10
+    "SMB1"
 ]
 
 
@@ -49,7 +50,7 @@ def set_all_entrance_rules(world: BananaManiaWorld) -> None:
         if world.options.world_structure == 0:  # progression
             world.set_rule(entrance, Has("Progressive World Unlock", world_num))
         else:  # individual
-            unlock_name = WORLD_UNLOCK_NAMES[world_num - 1]
+            unlock_name = STAGE_UNLOCK_NAMES[world_num - 1]
             world.set_rule(entrance, Has(unlock_name))
 
 

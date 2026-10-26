@@ -19,30 +19,42 @@ ITEM_NAME_TO_ID = {
     "Clock Tower Factory Unlock": 9,
     "Space Colony Unlock": 10,
     "Dr. Bad-Boon's Base Unlock": 11,
-    "Normal Switches": 20,
-    "Wormholes": 21,
-    "Fast Switches": 22,
-    "Pause Switches": 23,
-    "Progressive Time Increase": 30,
-    "+10 Time Bonus": 31,
-    "+20 Time Bonus": 32,
-    "+30 Time Bonus": 33,
-    "10 Banana Points": 40,
-    "100 Banana Points": 41,
-    "1000 Banana Points": 42,
-    "AiAi": 50,
-    "MeeMee": 51,
-    "Baby": 52,
-    "GonGon": 53,
-    "YanYan": 54,
-    "Doctor": 55,
-    "Jam": 56,
-    "Jet": 57,
-    "Sonic": 58,
-    "Tails": 59,
-    "Beat": 60,
-    "Kiryu": 61,
-    "Progressive Shop Stock": 100
+    "SMB1 Casual Challenge Mode Unlock": 12,
+    "SMB1 Normal Challenge Mode Unlock": 13,
+    "SMB1 Expert Challenge Mode Unlock": 14,
+    "SMB1 Master Challenge Mode Unlock": 15,
+    "SMB2 Casual Challenge Mode Unlock": 16,
+    "SMB2 Normal Challenge Mode Unlock": 17,
+    "SMB2 Expert Challenge Mode Unlock": 18,
+    "SMB2 Master Challenge Mode Unlock": 19,
+    "Reverse Mode Unlock": 20,
+    "Dark Banana Mode Unlock": 21,
+    "Golden Banana Mode Unlock": 22,
+    "Original Stages Mode Unlock": 23,
+    "Deluxe Stages Unlock": 24,
+    "Deluxe Beginner Stages Pack Unlock": 25,
+    "Deluxe Advanced Stages Pack Unlock": 26,
+    "Deluxe EX Stages Pack Unlock": 27,
+    "Normal Switches": 101,
+    "Wormholes": 102,
+    "Fast Switches": 103,
+    "Pause Switches": 104,
+    "Progressive Time Increase": 201,
+    "+10 Time Bonus": 202,
+    "+20 Time Bonus": 203,
+    "+30 Time Bonus": 204,
+    "AiAi": 401,
+    "MeeMee": 402,
+    "Baby": 403,
+    "GonGon": 404,
+    "YanYan": 405,
+    "Doctor": 406,
+    "Jam": 407,
+    "Jet": 408,
+    "Sonic": 409,
+    "Tails": 410,
+    "Beat": 411,
+    "Kiryu": 412
 }
 
 DEFAULT_ITEM_CLASSIFICATIONS = {
@@ -65,9 +77,6 @@ DEFAULT_ITEM_CLASSIFICATIONS = {
     "+10 Time Bonus": ItemClassification.useful,
     "+20 Time Bonus": ItemClassification.useful,
     "+30 Time Bonus": ItemClassification.useful,
-    "10 Banana Points": ItemClassification.useful,
-    "100 Banana Points": ItemClassification.useful,
-    "1000 Banana Points": ItemClassification.useful,
     "AiAi": ItemClassification.filler,
     "MeeMee": ItemClassification.filler,
     "Baby": ItemClassification.filler,
@@ -80,7 +89,6 @@ DEFAULT_ITEM_CLASSIFICATIONS = {
     "Tails": ItemClassification.filler,
     "Beat": ItemClassification.filler,
     "Kiryu": ItemClassification.filler,
-    "Progressive Shop Stock": ItemClassification.progression,
 }
 
 class BananaManiaItem(Item):
@@ -129,11 +137,6 @@ def create_all_items(world: BananaManiaWorld) -> None:
     itempool += [world.create_item("+10 Time Bonus") for _ in range(5)]
     itempool += [world.create_item("+20 Time Bonus") for _ in range(3)]
     itempool += [world.create_item("+30 Time Bonus") for _ in range(2)]
-
-    # Banana point items.
-    itempool += [world.create_item("10 Banana Points") for _ in range(10)]
-    itempool += [world.create_item("100 Banana Points") for _ in range(10)]
-    itempool += [world.create_item("1000 Banana Points") for _ in range(10)]
 
     # Character unlock items.
     for character in ["AiAi", "MeeMee", "Baby", "GonGon", "YanYan", "Doctor",
