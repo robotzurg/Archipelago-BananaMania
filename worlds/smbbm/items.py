@@ -57,8 +57,10 @@ DEFAULT_ITEM_CLASSIFICATIONS = {
     "Clock Tower Factory Unlock": ItemClassification.progression,
     "Space Colony Unlock": ItemClassification.progression,
     "Dr. Bad-Boon's Base Unlock": ItemClassification.progression,
-    "Switches": ItemClassification.progression,
+    "Normal Switches": ItemClassification.progression,
     "Wormholes": ItemClassification.progression,
+    "Fast Switches": ItemClassification.progression,
+    "Pause Switches": ItemClassification.progression,
     "Progressive Time Increase": ItemClassification.progression,
     "+10 Time Bonus": ItemClassification.useful,
     "+20 Time Bonus": ItemClassification.useful,
@@ -78,6 +80,7 @@ DEFAULT_ITEM_CLASSIFICATIONS = {
     "Tails": ItemClassification.filler,
     "Beat": ItemClassification.filler,
     "Kiryu": ItemClassification.filler,
+    "Progressive Shop Stock": ItemClassification.progression,
 }
 
 class BananaManiaItem(Item):
@@ -108,15 +111,16 @@ INDIVIDUAL_WORLD_UNLOCKS = [
 def create_all_items(world: BananaManiaWorld) -> None:
     itempool: list[Item] = []
 
-    # World unlock items: either 10 Progressive World Unlocks or 10 individual world unlocks.
     if world.options.world_structure == 0:  # progression
         itempool += [world.create_item("Progressive World Unlock") for _ in range(10)]
     else:  # worlds
         itempool += [world.create_item(name) for name in INDIVIDUAL_WORLD_UNLOCKS]
 
     # Progression items that gate content.
-    itempool.append(world.create_item("Switches"))
+    itempool.append(world.create_item("Normal Switches"))
     itempool.append(world.create_item("Wormholes"))
+    itempool.append(world.create_item("Fast Switches"))
+    itempool.append(world.create_item("Pause Switches"))
 
     # Progressive Time Increases increase by +10, to a max of 60. You start with 10 seconds, so 5.
     itempool += [world.create_item("Progressive Time Increase") for _ in range(5)]

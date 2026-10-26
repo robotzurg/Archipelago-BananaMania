@@ -628,7 +628,7 @@ def _include_mission(kind: MissionKind, world: BananaManiaWorld) -> bool:
         return bool(world.options.time_missions)
     if kind in (MissionKind.GREEN_GOAL, MissionKind.RED_GOAL):
         return bool(world.options.extra_goals)
-    if kind in (MissionKind.NONSTOP):
+    if kind is MissionKind.NONSTOP:
         return bool(world.options.nonstop_missions)
     return True
 
