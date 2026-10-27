@@ -9,32 +9,31 @@ if TYPE_CHECKING:
 
 ITEM_NAME_TO_ID = {
     "Progressive World Unlock": 1,
-    "Jungle Island Unlock": 2,
-    "Volcanic Magma Unlock": 3,
-    "Under the Ocean Unlock": 4,
-    "Inside a Whale Unlock": 5,
-    "Amusement Park Unlock": 6,
-    "Boiling Pot Unlock": 7,
-    "Bubbly Washing Machine Unlock": 8,
-    "Clock Tower Factory Unlock": 9,
-    "Space Colony Unlock": 10,
-    "Dr. Bad-Boon's Base Unlock": 11,
-    "SMB1 Casual Challenge Mode Unlock": 12,
-    "SMB1 Normal Challenge Mode Unlock": 13,
-    "SMB1 Expert Challenge Mode Unlock": 14,
-    "SMB1 Master Challenge Mode Unlock": 15,
-    "SMB2 Casual Challenge Mode Unlock": 16,
-    "SMB2 Normal Challenge Mode Unlock": 17,
-    "SMB2 Expert Challenge Mode Unlock": 18,
-    "SMB2 Master Challenge Mode Unlock": 19,
-    "Reverse Mode Unlock": 20,
-    "Dark Banana Mode Unlock": 21,
-    "Golden Banana Mode Unlock": 22,
-    "Original Stages Mode Unlock": 23,
-    "Deluxe Stages Unlock": 24,
-    "Deluxe Beginner Stages Pack Unlock": 25,
-    "Deluxe Advanced Stages Pack Unlock": 26,
-    "Deluxe EX Stages Pack Unlock": 27,
+    "World 2: Volcanic Magma Unlock": 2,
+    "World 3: Under the Ocean Unlock": 3,
+    "World 4: Inside a Whale Unlock": 4,
+    "World 5: Amusement Park Unlock": 5,
+    "World 6: Boiling Pot Unlock": 6,
+    "World 7: Bubbly Washing Machine Unlock": 7,
+    "World 8: Clock Tower Factory Unlock": 8,
+    "World 9: Space Colony Unlock": 9,
+    "World 10: Dr. Bad-Boon's Base Unlock": 10,
+    "SMB1 Casual Challenge Mode Unlock": 11,
+    "SMB1 Normal Challenge Mode Unlock": 12,
+    "SMB1 Expert Challenge Mode Unlock": 13,
+    "SMB1 Master Challenge Mode Unlock": 14,
+    "SMB2 Casual Challenge Mode Unlock": 15,
+    "SMB2 Normal Challenge Mode Unlock": 16,
+    "SMB2 Expert Challenge Mode Unlock": 17,
+    "SMB2 Master Challenge Mode Unlock": 18,
+    "Reverse Mode Unlock": 19,
+    "Dark Banana Mode Unlock": 20,
+    "Golden Banana Mode Unlock": 21,
+    "Original Stages Mode Unlock": 22,
+    "Deluxe Stages Unlock": 23,
+    "Deluxe Beginner Stages Pack Unlock": 24,
+    "Deluxe Advanced Stages Pack Unlock": 25,
+    "Deluxe EX Stages Pack Unlock": 26,
     "Normal Switches": 101,
     "Wormholes": 102,
     "Fast Switches": 103,
@@ -59,24 +58,23 @@ ITEM_NAME_TO_ID = {
 
 DEFAULT_ITEM_CLASSIFICATIONS = {
     "Progressive World Unlock": ItemClassification.progression,
-    "Jungle Island Unlock": ItemClassification.progression,
-    "Volcanic Magma Unlock": ItemClassification.progression,
-    "Under the Ocean Unlock": ItemClassification.progression,
-    "Inside a Whale Unlock": ItemClassification.progression,
-    "Amusement Park Unlock": ItemClassification.progression,
-    "Boiling Pot Unlock": ItemClassification.progression,
-    "Bubbly Washing Machine Unlock": ItemClassification.progression,
-    "Clock Tower Factory Unlock": ItemClassification.progression,
-    "Space Colony Unlock": ItemClassification.progression,
-    "Dr. Bad-Boon's Base Unlock": ItemClassification.progression,
+    "World 2: Volcanic Magma Unlock": ItemClassification.progression,
+    "World 3: Under the Ocean Unlock": ItemClassification.progression,
+    "World 4: Inside a Whale Unlock": ItemClassification.progression,
+    "World 5: Amusement Park Unlock": ItemClassification.progression,
+    "World 6: Boiling Pot Unlock": ItemClassification.progression,
+    "World 7: Bubbly Washing Machine Unlock": ItemClassification.progression,
+    "World 8: Clock Tower Factory Unlock": ItemClassification.progression,
+    "World 9: Space Colony Unlock": ItemClassification.progression,
+    "World 10: Dr. Bad-Boon's Base Unlock": ItemClassification.progression,
     "Normal Switches": ItemClassification.progression,
     "Wormholes": ItemClassification.progression,
     "Fast Switches": ItemClassification.progression,
     "Pause Switches": ItemClassification.progression,
     "Progressive Time Increase": ItemClassification.progression,
-    "+10 Time Bonus": ItemClassification.useful,
-    "+20 Time Bonus": ItemClassification.useful,
-    "+30 Time Bonus": ItemClassification.useful,
+    "+10 Time Bonus": ItemClassification.filler,
+    "+20 Time Bonus": ItemClassification.filler,
+    "+30 Time Bonus": ItemClassification.filler,
     "AiAi": ItemClassification.filler,
     "MeeMee": ItemClassification.filler,
     "Baby": ItemClassification.filler,
@@ -95,7 +93,10 @@ class BananaManiaItem(Item):
     game = "Super Monkey Ball Banana Mania"
 
 def get_random_filler_item_name(world: BananaManiaWorld) -> str:
-    return "10 Banana Points"
+    return world.random.choices(
+        ["+10 Time Bonus", "+20 Time Bonus", "+30 Time Bonus"],
+        weights=[6, 3, 1],
+    )[0]
 
 def create_item_with_correct_classification(world: BananaManiaWorld, name: str) -> BananaManiaItem:
     classification = DEFAULT_ITEM_CLASSIFICATIONS[name]
@@ -103,16 +104,15 @@ def create_item_with_correct_classification(world: BananaManiaWorld, name: str) 
 
 
 INDIVIDUAL_WORLD_UNLOCKS = [
-    "Jungle Island Unlock",
-    "Volcanic Magma Unlock",
-    "Under the Ocean Unlock",
-    "Inside a Whale Unlock",
-    "Amusement Park Unlock",
-    "Boiling Pot Unlock",
-    "Bubbly Washing Machine Unlock",
-    "Clock Tower Factory Unlock",
-    "Space Colony Unlock",
-    "Dr. Bad-Boon's Base Unlock",
+    "World 2: Volcanic Magma Unlock",
+    "World 3: Under the Ocean Unlock",
+    "World 4: Inside a Whale Unlock",
+    "World 5: Amusement Park Unlock",
+    "World 6: Boiling Pot Unlock",
+    "World 7: Bubbly Washing Machine Unlock",
+    "World 8: Clock Tower Factory Unlock",
+    "World 9: Space Colony Unlock",
+    "World 10: Dr. Bad-Boon's Base Unlock",
 ]
 
 
@@ -120,7 +120,7 @@ def create_all_items(world: BananaManiaWorld) -> None:
     itempool: list[Item] = []
 
     if world.options.world_structure == 0:  # progression
-        itempool += [world.create_item("Progressive World Unlock") for _ in range(10)]
+        itempool += [world.create_item("Progressive World Unlock") for _ in range(9)]
     else:  # worlds
         itempool += [world.create_item(name) for name in INDIVIDUAL_WORLD_UNLOCKS]
 
@@ -132,11 +132,6 @@ def create_all_items(world: BananaManiaWorld) -> None:
 
     # Progressive Time Increases increase by +10, to a max of 60. You start with 10 seconds, so 5.
     itempool += [world.create_item("Progressive Time Increase") for _ in range(5)]
-
-    # Useful time bonus items.
-    itempool += [world.create_item("+10 Time Bonus") for _ in range(5)]
-    itempool += [world.create_item("+20 Time Bonus") for _ in range(3)]
-    itempool += [world.create_item("+30 Time Bonus") for _ in range(2)]
 
     # Character unlock items.
     for character in ["AiAi", "MeeMee", "Baby", "GonGon", "YanYan", "Doctor",

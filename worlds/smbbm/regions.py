@@ -40,13 +40,13 @@ def create_and_connect_regions(world: BananaManiaWorld) -> None:
 
 
 def create_all_regions(world: BananaManiaWorld) -> None:
-    overworld = Region("Menu", world.player, world.multiworld)
+    menu = Region("Menu", world.player, world.multiworld)
     regions = [Region(name, world.player, world.multiworld) for name in WORLD_REGIONS]
-    world.multiworld.regions += [overworld, *regions]
+    world.multiworld.regions += [menu, *regions]
 
 
 def connect_regions(world: BananaManiaWorld) -> None:
-    overworld = world.get_region("Menu")
+    menu = world.get_region("Menu")
 
     for region_name in WORLD_REGIONS:
-        overworld.connect(world.get_region(region_name), f"Menu to {region_name}")
+        menu.connect(world.get_region(region_name), f"Menu to {region_name}")

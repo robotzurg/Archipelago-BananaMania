@@ -80,7 +80,7 @@ class StageData:
     base_id: int
     name: str = ""                             # in-game stage name, e.g. "Simple"
     clear: Mission = Mission()                 # For clearing, green/red goals inherit from this unless specified otherwise
-    missions: dict[MissionKind, Mission] = {}
+    missions: dict[MissionKind, Mission] = field(default_factory=dict)
     items: Requirement = ()                    # required by every mission on this stage
     items_int: Requirement | None = None       # Inherits from standard items unless specified; () means none needed
     items_exp: Requirement | None = None       # Inherits from items_int, then items
@@ -604,7 +604,7 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
     # SMB1 Challenge Mode
     # The individual level location ids are base id of difficulty stages + 10000 to make it easier to
     # sequentially check them, because you can't play them individually so logic has to work around that.
-    "SMB1 Challenge Mode": [
+    "SMB1 Casual": [
         StageData(1001, name="Casual Stages", clear=Mission(seconds=30, seconds_int=20), category=True, missions={
             MissionKind.CHALLENGE_CLEAR: Mission(amount=10, seconds=30, seconds_int=20)
         }),
@@ -622,6 +622,9 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(11012, name="Hitter",                  clear=Mission()),
         StageData(11013, name="Banana Plate (Casual)",   clear=Mission(seconds=20)),
 
+    ],
+
+    "SMB1 Normal": [
         StageData(1101, name="Normal Stages", clear=Mission(seconds=39, seconds_int=30), category=True, missions={
             MissionKind.CHALLENGE_CLEAR: Mission(amount=30, seconds=39, seconds_int=30)
         }),
@@ -661,6 +664,9 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(11134, name="Banana Plate (Normal)",  clear=Mission(seconds=20)),
         StageData(11135, name="Polar Large",            clear=Mission(seconds=20)),
 
+    ],
+
+    "SMB1 Expert": [
         StageData(1201, name="Expert Stages", clear=Mission(seconds=60, seconds_int=50), category=True, missions={
             MissionKind.CHALLENGE_CLEAR: Mission(amount=99, seconds=60, seconds_int=50)
         }),
@@ -699,32 +705,35 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(11233, name="Ant Lion Super",         clear=Mission()),
         StageData(11234, name="Drum",                   clear=Mission()),
         StageData(11235, name="Twister",                clear=Mission()),
-        StageData(11235, name="Speedy Jam",             clear=Mission(seconds=20)),
-        StageData(11235, name="Quake",                  clear=Mission()),
-        StageData(11235, name="Cassiopeia",             clear=Mission(seconds=30, seconds_int=20, seconds_exp=0)),
-        StageData(11235, name="Pirates",                clear=Mission()),
-        StageData(11235, name="Bonus Hunting",          clear=Mission()),
-        StageData(11235, name="Bowl Open",              clear=Mission()),
-        StageData(11235, name="Checker",                clear=Mission()),
-        StageData(11235, name="Carpet",                 clear=Mission(seconds=30)),
-        StageData(11235, name="Ridge",                  clear=Mission(seconds=30)),
-        StageData(11235, name="Mixer",                  clear=Mission(seconds=20)),
-        StageData(11235, name="Rings",                  clear=Mission(seconds=20)),
-        StageData(11235, name="Stairs",                 clear=Mission()),
-        StageData(11235, name="Clover",                 clear=Mission(seconds=30)),
-        StageData(11235, name="Coffee Cup",             clear=Mission()),
-        StageData(11235, name="Metamorphosis",          clear=Mission()),
-        StageData(11235, name="Blur Bridge (Expert)",   clear=Mission(seconds=20)),
-        StageData(11235, name="Breathe",                clear=Mission()),
-        StageData(11235, name="Hard Hitter (Expert)",   clear=Mission()),
-        StageData(11235, name="Ferris Wheel",           clear=Mission()),
-        StageData(11235, name="Factory",                clear=Mission(seconds=20)),
-        StageData(11235, name="Curl Pipe",              clear=Mission()),
-        StageData(11235, name="Magic Hand",             clear=Mission()),
-        StageData(11235, name="Banana Plate (Expert)",  clear=Mission()),
-        StageData(11235, name="Sanctuary",              clear=Mission(seconds=20)),
-        StageData(11235, name="Daa Loo Maa",            clear=Mission(seconds=20)),
+        StageData(11236, name="Speedy Jam",             clear=Mission(seconds=20)),
+        StageData(11237, name="Quake",                  clear=Mission()),
+        StageData(11238, name="Cassiopeia",             clear=Mission(seconds=30, seconds_int=20, seconds_exp=0)),
+        StageData(11239, name="Pirates",                clear=Mission()),
+        StageData(11240, name="Bonus Hunting",          clear=Mission()),
+        StageData(11241, name="Bowl Open",              clear=Mission()),
+        StageData(11242, name="Checker",                clear=Mission()),
+        StageData(11243, name="Carpet",                 clear=Mission(seconds=30)),
+        StageData(11244, name="Ridge",                  clear=Mission(seconds=30)),
+        StageData(11245, name="Mixer",                  clear=Mission(seconds=20)),
+        StageData(11246, name="Rings",                  clear=Mission(seconds=20)),
+        StageData(11247, name="Stairs",                 clear=Mission()),
+        StageData(11248, name="Clover",                 clear=Mission(seconds=30)),
+        StageData(11249, name="Coffee Cup",             clear=Mission()),
+        StageData(11250, name="Metamorphosis",          clear=Mission()),
+        StageData(11251, name="Blur Bridge (Expert)",   clear=Mission(seconds=20)),
+        StageData(11252, name="Breathe",                clear=Mission()),
+        StageData(11253, name="Hard Hitter (Expert)",   clear=Mission()),
+        StageData(11254, name="Ferris Wheel",           clear=Mission()),
+        StageData(11255, name="Factory",                clear=Mission(seconds=20)),
+        StageData(11256, name="Curl Pipe",              clear=Mission()),
+        StageData(11257, name="Magic Hand",             clear=Mission()),
+        StageData(11258, name="Banana Plate (Expert)",  clear=Mission()),
+        StageData(11259, name="Sanctuary",              clear=Mission(seconds=20)),
+        StageData(11260, name="Daa Loo Maa",            clear=Mission(seconds=20)),
 
+    ],
+
+    "SMB1 Master": [
         StageData(1301, name="Master Stages", clear=Mission(seconds=50), category=True, missions={
             MissionKind.CHALLENGE_CLEAR: Mission(amount=50, seconds=50)
         }),
@@ -741,41 +750,173 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
     ],
 
     # SMB2 Challenge Mode
-    "SMB2 Challenge Mode": [
+    "SMB2 Casual": [
         StageData(1401, name="Casual EX Stages", clear=Mission(seconds=28), items=("Pause Switches",), category=True, missions={
             MissionKind.CHALLENGE_CLEAR: Mission(amount=10, seconds=28, items=("Pause Switches",))
         }),
-        StageData(11401, name="Conveyors",      clear=Mission()),
-        StageData(11402, name="Bumpy Check",    clear=Mission(seconds=13, seconds_int=12, seconds_exp=0)),
-        StageData(11403, name="Alternative",    clear=Mission(seconds=21, seconds_int=14)),
-        StageData(11404, name="Junction",       clear=Mission(seconds=13, seconds_int=13, seconds_exp=0)),
-        StageData(11405, name="Bead Screen",    clear=Mission(seconds=14, seconds_int=0)),
-        StageData(11406, name="Fluctuation",    clear=Mission(seconds=15, seconds_int=0)),
-        StageData(11407, name="Folders",        clear=Mission(seconds=13)),
-        StageData(11408, name="Quick Turn",     clear=Mission()),
-        StageData(11409, name="Linear Seesaws", clear=Mission()),
-        StageData(11410, name="Birth",          clear=Mission(seconds=28, items=("Pause Switches",))),
+        StageData(11401, name="Simple",           clear=Mission()),
+        StageData(11402, name="Hollow",           clear=Mission(seconds=18, seconds_int=0)),
+        StageData(11403, name="Bumpy",            clear=Mission()),
+        StageData(11404, name="Switches",         clear=Mission(items=("Normal Switches",))),
+        StageData(11405, name="Rising Inclines",  clear=Mission(seconds=14, seconds_int=0)),
+        StageData(11406, name="Floaters",         clear=Mission()),
+        StageData(11407, name="Tub",              clear=Mission(seconds=15, seconds_int=0)),
+        StageData(11408, name="Windy Slide",      clear=Mission(seconds=32, seconds_int=29, seconds_exp=19)),
+        StageData(11409, name="Spinning Top",     clear=Mission(seconds=14, seconds_int=11, seconds_exp=0)),
+        StageData(11410, name="Curve Bridge",     clear=Mission(seconds=34)),
 
+        StageData(11411, name="Conveyors",        clear=Mission()),
+        StageData(11412, name="Bumpy Check",      clear=Mission(seconds=13, seconds_int=12, seconds_exp=0)),
+        StageData(11413, name="Alternative",      clear=Mission(seconds=21, seconds_int=14)),
+        StageData(11414, name="Junction",         clear=Mission(seconds=13, seconds_int=13, seconds_exp=0)),
+        StageData(11415, name="Bead Screen",      clear=Mission(seconds=14, seconds_int=0)),
+        StageData(11416, name="Fluctuation",      clear=Mission(seconds=15, seconds_int=0)),
+        StageData(11417, name="Folders",          clear=Mission(seconds=13)),
+        StageData(11418, name="Quick Turn",       clear=Mission()),
+        StageData(11419, name="Linear Seesaws",   clear=Mission()),
+        StageData(11420, name="Birth",            clear=Mission(seconds=28, items=("Pause Switches",))),
+
+    ],
+
+    "SMB2 Normal": [
         StageData(1501, name="Normal EX Stages", clear=Mission(seconds=32, seconds_int=32, seconds_exp=22), items=("Normal Switches",), category=True, missions={
             MissionKind.CHALLENGE_CLEAR: Mission(amount=30, seconds=32, seconds_int=32, seconds_exp=22, items=("Normal Switches",))
         }),
-        StageData(11501, name="Conveyors",      clear=Mission()),
-        StageData(11502, name="Bumpy Check",    clear=Mission(seconds=13, seconds_int=12, seconds_exp=0)),
-        StageData(11503, name="Alternative",    clear=Mission(seconds=21, seconds_int=14)),
-        StageData(11504, name="Junction",       clear=Mission(seconds=13, seconds_int=13, seconds_exp=0)),
-        StageData(11505, name="Bead Screen",    clear=Mission(seconds=14, seconds_int=0)),
-        StageData(11506, name="Fluctuation",    clear=Mission(seconds=15, seconds_int=0)),
-        StageData(11507, name="Folders",        clear=Mission(seconds=13)),
-        StageData(11508, name="Quick Turn",     clear=Mission()),
-        StageData(11509, name="Linear Seesaws", clear=Mission()),
-        StageData(11510, name="Birth",          clear=Mission(seconds=28, items=("Pause Switches",))),
+        StageData(11501, name="Banks",            clear=Mission(seconds=15, seconds_int=0)),
+        StageData(11502, name="Eaten Floor",      clear=Mission(seconds=15, seconds_int=11, seconds_exp=0)),
+        StageData(11503, name="Hoppers",          clear=Mission()),
+        StageData(11504, name="Coaster",          clear=Mission(seconds=23, seconds_int=22, seconds_exp=17)),
+        StageData(11505, name="Board Park",       clear=Mission()),
+        StageData(11506, name="Swell",            clear=Mission()),
+        StageData(11507, name="Gravity Slider",   clear=Mission(seconds=19)),
+        StageData(11508, name="Inchworms",        clear=Mission(seconds=12, seconds_int=12, seconds_exp=0)),
+        StageData(11509, name="Totalitarianism",  clear=Mission(seconds=12, seconds_int=12, seconds_exp=0)),
+        StageData(11510, name="Leveler",          clear=Mission()),
+        StageData(11511, name="Organic Form",     clear=Mission(seconds=17)),
+        StageData(11512, name="Reversible Gear",  clear=Mission(seconds=13)),
+        StageData(11513, name="Stepping Stones",  clear=Mission(seconds=19)),
+        StageData(11514, name="Dribbles",         clear=Mission(seconds=48, seconds_int=34)),
+        StageData(11515, name="Push Bar",         clear=Mission(seconds=13, seconds_int=0)), 
+        StageData(11516, name="Mad Rings",        clear=Mission()),
+        StageData(11517, name="Curvy Options",    clear=Mission(seconds=13)),
+        StageData(11518, name="Twist & Spin",     clear=Mission(seconds=11, seconds_int=11, seconds_exp=0)),
+        StageData(11519, name="Cascade",          clear=Mission(seconds=29, seconds_int=14, seconds_exp=0)),
+        StageData(11520, name="Rampage",          clear=Mission()),
+        StageData(11521, name="Pro Skaters",      clear=Mission(items=("Pause Switches",), items_int=(), items_exp=())),
+        StageData(11522, name="Giant Comb",       clear=Mission(seconds=28, seconds_int=12, seconds_exp=0)),
+        StageData(11523, name="Beehive",          clear=Mission(seconds=27, seconds_int=13)),
+        StageData(11524, name="Dynamic Maze",     clear=Mission(seconds=19, seconds_exp=0)),
+        StageData(11525, name="Triangle Holes",   clear=Mission()),
+        StageData(11526, name="Launchers",        clear=Mission(seconds=28, seconds_int=18)),
+        StageData(11527, name="Randomizer",       clear=Mission(seconds=14, seconds_int=11, seconds_exp=0)),
+        StageData(11528, name="Coin Slots",       clear=Mission(seconds=26, seconds_int=11)),
+        StageData(11529, name="Seesaw Bridges",   clear=Mission(seconds=48, seconds_int=38, seconds_exp=29)),
+        StageData(11530, name="Arthropod",        clear=Mission(seconds=12)),
 
+        StageData(11531, name="Auto Doors",       clear=Mission(seconds=22)),
+        StageData(11532, name="Heavy Sphere",     clear=Mission(items=("Normal Switches",))),
+        StageData(11533, name="Stagger",          clear=Mission(seconds=22)),
+        StageData(11534, name="U.F.O",            clear=Mission(seconds=17, items=("Normal Switches",))),
+        StageData(11535, name="Ring Bridges",     clear=Mission(seconds=22, seconds_int=19)),
+        StageData(11536, name="Domes",            clear=Mission(seconds=17, seconds_int=0)),
+        StageData(11537, name="Amida Lot",        clear=Mission()),
+        StageData(11538, name="Long Slider",      clear=Mission(seconds=32, seconds_exp=0)),
+        StageData(11539, name="Grid Bridge",      clear=Mission(seconds=15, seconds_exp=0, items=("Normal Switches",), items_int=(), items_exp=())),
+        StageData(11540, name="Teapot",           clear=Mission(items=("Normal Switches",))),
+    ],
+
+    "SMB2 Expert": [
         StageData(1601, name="Expert EX Stages", clear=Mission(seconds=39), category=True, missions={
             MissionKind.CHALLENGE_CLEAR: Mission(amount=99, seconds=39)
         }),
+        StageData(11601, name="Wormhole",         clear=Mission(seconds=22, seconds_int=19, items=("Wormholes",))),
+        StageData(11602, name="Free Fall",        clear=Mission(seconds=18, seconds_exp=0)),
+        StageData(11603, name="Melting Pot",      clear=Mission()),
+        StageData(11604, name="Mad Shuffle",      clear=Mission(items=("Wormholes",))),
+        StageData(11605, name="Partition",        clear=Mission()), 
+        StageData(11606, name="Jump Machine",     clear=Mission(seconds=12)),
+        StageData(11607, name="Zigzag Slope",     clear=Mission(seconds=17)),
+        StageData(11608, name="Tower",            clear=Mission(seconds=12, items=("Wormholes",))),
+        StageData(11609, name="Toggle",           clear=Mission()),
+        StageData(11610, name="Pachinko",         clear=Mission()),
+        StageData(11611, name="Combination",      clear=Mission(seconds=25, seconds_int=0, items=("Wormholes", "Normal Switches"), items_int=("Wormholes",), items_exp=("Wormholes",))),
+        StageData(11612, name="Punched Seesaws",  clear=Mission()),
+        StageData(11613, name="Opera",            clear=Mission(seconds=45, seconds_int=34, seconds_exp=29)),
+        StageData(11614, name="Brandished",       clear=Mission()),
+        StageData(11615, name="Tiers",            clear=Mission(seconds=16, items=("Wormholes",))),
+        StageData(11616, name="Cliffs",           clear=Mission(seconds=29, seconds_int=19, seconds_exp=0)),
+        StageData(11617, name="Narrow Peaks",     clear=Mission(seconds=17, seconds_int=0)),
+        StageData(11618, name="Detours",          clear=Mission(seconds=11, seconds_int=0, items=("Wormholes",))),
+        StageData(11619, name="Switch Inferno",   clear=Mission(items=("Normal Switches",))),
+        StageData(11620, name="Earthquake",       clear=Mission()),
+        StageData(11621, name="Spiral Bridge",    clear=Mission(seconds=19)),
+        StageData(11622, name="Wavy Option",      clear=Mission()),
+        StageData(11623, name="Obstacle",         clear=Mission(seconds=19)),
+        StageData(11624, name="Domino",           clear=Mission(seconds=11, seconds_int=0, items=("Normal Switches",), items_int=("Normal Switches",), items_exp=())),
+        StageData(11625, name="Sieve",            clear=Mission(seconds=28)),
+        StageData(11626, name="Flock",            clear=Mission(seconds=49, seconds_int=19, seconds_exp=0)),
+        StageData(11627, name="Double Spiral",    clear=Mission(seconds=19)),
+        StageData(11628, name="Hierarchy",        clear=Mission(seconds=24, seconds_int=0)),
+        StageData(11629, name="8 Bracelets",      clear=Mission(seconds=21)),
+        StageData(11630, name="Banana Hunting",   clear=Mission()),
+        StageData(11631, name="Pistons",          clear=Mission(seconds=27, seconds_int=16)),
+        StageData(11632, name="Soft Cream",       clear=Mission(seconds=17, seconds_int=13, seconds_exp=0, items=("Normal Switches",), items_int=(AnyOf("Normal Switches", "Fast Switches"),), items_exp=(AnyOf("Normal Switches", "Fast Switches"),))),
+        StageData(11633, name="Momentum",         clear=Mission()),
+        StageData(11634, name="Entangled Path",   clear=Mission(seconds=41, seconds_int=31, seconds_exp=30, items=("Normal Switches", "Fast Switches"), items_int=("Normal Switches", "Fast Switches"), items_exp=())),
+        StageData(11635, name="Totters",          clear=Mission()),
+        StageData(11636, name="Vortex",           clear=Mission(seconds=27, seconds_int=18)),
+        StageData(11637, name="Warp",             clear=Mission(seconds=27)),
+        StageData(11638, name="Trampolines",      clear=Mission(seconds=29, seconds_int=16)),
+        StageData(11639, name="Swing Shaft",      clear=Mission(seconds=26, seconds_int=14)),
+        StageData(11640, name="Fighters",         clear=Mission()),
+        StageData(11641, name="Serial Jump",      clear=Mission()),
+        StageData(11642, name="Cross Floors",     clear=Mission(seconds=14)),
+        StageData(11643, name="Spinning Saw",     clear=Mission(seconds=25, seconds_int=0)),
+        StageData(11644, name="Chipped Pipes",    clear=Mission(seconds=15, seconds_int=0)),
+        StageData(11645, name="Flat Maze",        clear=Mission(seconds=56, seconds_int=39, seconds_exp=22)),
+        StageData(11646, name="Guillotine",       clear=Mission(seconds=25, seconds_exp=19)),
+        StageData(11647, name="Cork Screw",       clear=Mission(seconds=18)),
+        StageData(11648, name="Orbiters",         clear=Mission()),
+        StageData(11649, name="Twin Basin",       clear=Mission(seconds=15, seconds_int=0)),
+        StageData(11650, name="Air Hockey",       clear=Mission(seconds=19, seconds_int=0)),
+
+        StageData(11651, name="Charge",           clear=Mission(seconds=11, items=("Wormholes",))),
+        StageData(11652, name="Strata",           clear=Mission(seconds=27)),
+        StageData(11653, name="Square Dance",     clear=Mission()),
+        StageData(11654, name="Giant Swing",      clear=Mission(seconds=39)),
+        StageData(11655, name="5 Drums",          clear=Mission(seconds=18)),
+        StageData(11656, name="Free Throw",       clear=Mission()),
+        StageData(11657, name="Pendulums",        clear=Mission(seconds=36, seconds_exp=0)),
+        StageData(11658, name="Conical Slider",   clear=Mission(seconds=35), items=("Wormholes",)),
+        StageData(11659, name="Construction",     clear=Mission(seconds=39)),
+        StageData(11660, name="Train Worm",       clear=Mission(seconds=29, seconds_int=0)),
+    ],
+
+    "SMB2 Master": [
         StageData(1701, name="Master EX Stages", clear=Mission(seconds=53), category=True, missions={
             MissionKind.CHALLENGE_CLEAR: Mission(amount=70, seconds=53)
         }),
+        StageData(11701, name="Centrifugal",      clear=Mission(seconds=22, seconds_int=18, seconds_exp=0)),
+        StageData(11702, name="Swing Bridges",    clear=Mission(seconds=18)),
+        StageData(11703, name="Cylinders",        clear=Mission()),
+        StageData(11704, name="Passage",          clear=Mission(seconds=23)),
+        StageData(11705, name="Notch",            clear=Mission(seconds=15)),
+        StageData(11706, name="Intermittent",     clear=Mission()),
+        StageData(11707, name="Long Torus",       clear=Mission(seconds=22)),
+        StageData(11708, name="Spasmodic",        clear=Mission()),
+        StageData(11709, name="Double Twin",      clear=Mission(seconds=18)),
+        StageData(11710, name="Clock Face",       clear=Mission(seconds=23)),
+
+        StageData(11711, name="Variable Width",   clear=Mission()),
+        StageData(11712, name="Striker",          clear=Mission(seconds=15, seconds_int=0)),
+        StageData(11713, name="Ooparts",          clear=Mission()),
+        StageData(11714, name="Planets",          clear=Mission(seconds=18)),
+        StageData(11715, name="Sliced Cheese",    clear=Mission(seconds=23)),
+        StageData(11716, name="8 Seesaws",        clear=Mission(seconds=12)),
+        StageData(11717, name="Synchronized",     clear=Mission()),
+        StageData(11718, name="Helix",            clear=Mission(seconds=53)),
+        StageData(11719, name="Dizzy System",     clear=Mission()),
+        StageData(11720, name="Destiny",          clear=Mission(seconds=31)),
     ],
 
     # Deluxe Stages
@@ -901,7 +1042,7 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(5161, name="Training",     clear=Mission(seconds=60)),
         StageData(5171, name="Flat Maze",    clear=Mission(seconds=60)),
         StageData(5181, name="Strata",       clear=Mission(seconds=60)),
-        StageData(5191, name="Crazy Mazze",  clear=Mission(seconds=60)),
+        StageData(5191, name="Crazy Maze",  clear=Mission(seconds=60)),
     ],
 
     # Original Stages Mode
@@ -948,7 +1089,9 @@ def labeled_stages(group: str) -> list[tuple[str, StageData]]:
     labeled = []
     number = 0
     for stage in STAGE_GROUPS[group]:
-        if stage.category:
+        if stage.special:
+            labeled.append((f"[{group}]", stage))
+        elif stage.category:
             labeled.append((f"[{group}]", stage))
         else:
             number += 1
@@ -957,11 +1100,14 @@ def labeled_stages(group: str) -> list[tuple[str, StageData]]:
 
 
 def location_name(label: str, stage: StageData, kind: MissionKind, mission: Mission) -> str:
-    """Build the display name """
-    prefix = f"{label} {stage.name} -" if stage.name else label
+    """Build the display name"""
+    # Categories only show their group label, not the stage name
+    prefix = f"{label} {stage.name} -" if stage.name and not stage.category else label
 
     if kind is MissionKind.BANANAS and mission.amount == ALL_BANANAS:
         return f"{prefix} Banana Complete"
+    if stage.category and kind is MissionKind.CLEAR:
+        return f"{prefix} Course Clear"
     if mission.amount is not None:
         return f"{prefix} {kind.label} {mission.amount}"
     return f"{prefix} {kind.label}"
@@ -999,19 +1145,61 @@ def _include_mission(kind: MissionKind, world: BananaManiaWorld) -> bool:
         return bool(world.options.nonstop_missions)
     return True
 
-
-def create_regular_locations(world: BananaManiaWorld) -> None:
-    # Each world's stage group (W1 through W10) goes in that world's region.
-    for world_num in range(1, 11):
-        region = world.get_region(f"World {world_num}")
+def create_mission_locations(world: BananaManiaWorld, region, stage_label):
+        region = world.get_region(region)
         stage_locations = get_location_names_with_ids([
             location_name(label, stage, kind, mission)
-            for label, stage in labeled_stages(f"W{world_num}")
+            for label, stage in labeled_stages(stage_label)
             for kind, mission in stage.all_missions() if _include_mission(kind, world)
         ])
         region.add_locations(stage_locations, BananaManiaLocation)
 
+def create_regular_locations(world: BananaManiaWorld) -> None:
+    # Each world's stage group (W1 through W10) goes in that world's region.
+    for world_num in range(1, 11):
+        create_mission_locations(world, f"World {world_num}", f"W{world_num}")
+
+    # Create challenge modes
+    if world.options.smb1_casual:
+        create_mission_locations(world, "SMB1 Casual", "SMB1 Casual")
+    if world.options.smb1_normal:
+        create_mission_locations(world, "SMB1 Normal", "SMB1 Normal")
+    if world.options.smb1_expert:
+        create_mission_locations(world, "SMB1 Expert", "SMB1 Expert")
+    if world.options.smb1_master:
+        create_mission_locations(world, "SMB1 Master", "SMB1 Master")
+    if world.options.smb2_casual:
+        create_mission_locations(world, "SMB2 Casual", "SMB2 Casual")
+    if world.options.smb2_normal:
+        create_mission_locations(world, "SMB2 Normal", "SMB2 Normal")
+    if world.options.smb2_expert:
+        create_mission_locations(world, "SMB2 Expert", "SMB2 Expert")
+    if world.options.smb2_master:
+        create_mission_locations(world, "SMB2 Master", "SMB2 Master")
+
+    # Special Modes
+    if world.options.deluxe_stages:
+        create_mission_locations(world, "Deluxe Mode", "SP DX")
+        create_mission_locations(world, "Deluxe Mode", "SP DX Beginner")
+        create_mission_locations(world, "Deluxe Mode", "SP DX Advanced")
+        create_mission_locations(world, "Deluxe Mode", "SP DX EX")
+
+    if world.options.reverse_mode:
+        create_mission_locations(world, "Reverse Mode", "SP Reverse")
+
+    if world.options.dark_banana_mode:
+        create_mission_locations(world, "Dark Banana Mode", "SP Dark")
+
+    if world.options.golden_banana_mode:
+        create_mission_locations(world, "Golden Banana Mode", "SP Golden")
+
+    if world.options.original_stages_mode:
+        create_mission_locations(world, "Original Stages Mode", "SP Original")
 
 def create_events(world: BananaManiaWorld) -> None:
-    # TODO: Handle the victory event placement here
+    # Temporary goal
+    world_10 = world.get_region("World 10")
+    world_10.add_event(
+        "Cleared World 10", "Victory", location_type=BananaManiaLocation, item_type=items.BananaManiaItem
+    )
     pass

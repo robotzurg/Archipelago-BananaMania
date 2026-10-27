@@ -22,7 +22,17 @@ class BananaManiaWorld(World):
     location_name_to_id = locations.LOCATION_NAME_TO_ID
     item_name_to_id = items.ITEM_NAME_TO_ID
 
-    origin_region_name = "Overworld"
+    origin_region_name = "Menu"
+
+    ut_can_gen_without_yaml = True
+
+    def generate_early(self) -> None:
+        passthrough = getattr(self.multiworld, "re_gen_passthrough", {})
+        if self.game in passthrough:
+            for key, value in passthrough[self.game].items():
+                if hasattr(self.options, key):
+                    getattr(self.options, key).value = value
+
 
     def create_regions(self) -> None:
         regions.create_and_connect_regions(self)
@@ -42,5 +52,13 @@ class BananaManiaWorld(World):
 
     def fill_slot_data(self) -> Mapping[str, Any]:
         return self.options.as_dict(
-            "banana_missions", "time_missions", "extra_goals", "nonstop_missions", "world_structure"
+            "banana_missions", "time_missions", "extra_goals", "nonstop_missions", "world_structure",
+            "logic_difficulty", "smb1_casual", "smb1_normal", "smb1_expert", "smb1_master", 
+            "smb2_casual", "smb2_normal", "smb2_expert", "smb2_master", "deluxe_stages",
+            "deluxe_unlock_style", "reverse_mode", "dark_banana_mode", "golden_banana_mode", "original_stages_mode" 
         )
+
+    @staticmethod
+    def interpret_slot_data(slot_data: dict[str, Any]) -> dict[str, Any]:
+        return slot_data
+

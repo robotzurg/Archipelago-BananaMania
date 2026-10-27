@@ -22,8 +22,7 @@ STAGE_UNLOCK_NAMES = [
     "World 7: Bubbly Washing Machine Unlock",  # World 7
     "World 8: Clock Tower Factory Unlock",     # World 8
     "World 9: Space Colony Unlock",            # World 9
-    "World 10: Dr. Bad-Boon's Base Unlock",     # World 10
-    "SMB1"
+    "World 10: Dr. Bad-Boon's Base Unlock",    # World 10
 ]
 
 
@@ -45,10 +44,10 @@ def set_all_rules(world: BananaManiaWorld) -> None:
 
 
 def set_all_entrance_rules(world: BananaManiaWorld) -> None:
-    for world_num in range(1, 11):
-        entrance = world.get_entrance(f"Overworld to World {world_num}")
+    for world_num in range(2, 11):
+        entrance = world.get_entrance(f"Menu to World {world_num}")
         if world.options.world_structure == 0:  # progression
-            world.set_rule(entrance, Has("Progressive World Unlock", world_num))
+            world.set_rule(entrance, Has("Progressive World Unlock", world_num - 1))
         else:  # individual
             unlock_name = STAGE_UNLOCK_NAMES[world_num - 1]
             world.set_rule(entrance, Has(unlock_name))

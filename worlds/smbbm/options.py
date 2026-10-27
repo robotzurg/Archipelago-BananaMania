@@ -35,6 +35,7 @@ class WorldStructure(Choice):
     How the SMB2 campaign world items should be structured.
     progression: Receive "Progressive World Unlock", which unlocks the next world in order.
     worlds: Receive specific world unlocks, making you do worlds out of order.
+    You will always start with world 1 first.
     """
 
     display_name = "World Structure"
@@ -42,7 +43,7 @@ class WorldStructure(Choice):
     option_progression = 0
     option_worlds = 1
 
-    default = option_progression
+    default = option_worlds
 
 class LogicDifficulty(Choice):
     """
