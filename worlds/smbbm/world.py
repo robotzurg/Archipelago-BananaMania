@@ -26,6 +26,15 @@ class BananaManiaWorld(World):
 
     ut_can_gen_without_yaml = True
 
+    # Sort by region then location ids within that region
+    def custom_ut_sort(self, region_label: str, location_label: str) -> int:
+        if region_label in regions.WORLD_REGIONS:
+            region_index = regions.WORLD_REGIONS.index(region_label)
+        else:
+            region_index = len(regions.WORLD_REGIONS)
+        location_id = self.location_name_to_id.get(location_label, 999999)
+        return region_index * 1_000_000 + location_id
+
     def generate_early(self) -> None:
         passthrough = getattr(self.multiworld, "re_gen_passthrough", {})
         if self.game in passthrough:

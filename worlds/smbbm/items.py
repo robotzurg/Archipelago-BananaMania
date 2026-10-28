@@ -30,10 +30,10 @@ ITEM_NAME_TO_ID = {
     "Dark Banana Mode Unlock": 20,
     "Golden Banana Mode Unlock": 21,
     "Original Stages Mode Unlock": 22,
-    "Deluxe Stages Unlock": 23,
-    "Deluxe Beginner Stages Pack Unlock": 24,
-    "Deluxe Advanced Stages Pack Unlock": 25,
-    "Deluxe EX Stages Pack Unlock": 26,
+    "Deluxe Mode Unlock": 23,
+    "Deluxe Beginner Stages Pack": 24,
+    "Deluxe Advanced Stages Pack": 25,
+    "Deluxe EX Stages Pack": 26,
     "Normal Switches": 101,
     "Wormholes": 102,
     "Fast Switches": 103,
@@ -67,6 +67,22 @@ DEFAULT_ITEM_CLASSIFICATIONS = {
     "World 8: Clock Tower Factory Unlock": ItemClassification.progression,
     "World 9: Space Colony Unlock": ItemClassification.progression,
     "World 10: Dr. Bad-Boon's Base Unlock": ItemClassification.progression,
+    "SMB1 Casual Challenge Mode Unlock": ItemClassification.progression,
+    "SMB1 Normal Challenge Mode Unlock": ItemClassification.progression,
+    "SMB1 Expert Challenge Mode Unlock": ItemClassification.progression,
+    "SMB1 Master Challenge Mode Unlock": ItemClassification.progression,
+    "SMB2 Casual Challenge Mode Unlock": ItemClassification.progression,
+    "SMB2 Normal Challenge Mode Unlock": ItemClassification.progression,
+    "SMB2 Expert Challenge Mode Unlock": ItemClassification.progression,
+    "SMB2 Master Challenge Mode Unlock": ItemClassification.progression,
+    "Reverse Mode Unlock": ItemClassification.progression,
+    "Dark Banana Mode Unlock": ItemClassification.progression,
+    "Golden Banana Mode Unlock": ItemClassification.progression,
+    "Original Stages Mode Unlock": ItemClassification.progression,
+    "Deluxe Mode Unlock": ItemClassification.progression,
+    "Deluxe Beginner Stages Pack": ItemClassification.progression,
+    "Deluxe Advanced Stages Pack": ItemClassification.progression,
+    "Deluxe EX Stages Pack": ItemClassification.progression,
     "Normal Switches": ItemClassification.progression,
     "Wormholes": ItemClassification.progression,
     "Fast Switches": ItemClassification.progression,
@@ -119,12 +135,31 @@ INDIVIDUAL_WORLD_UNLOCKS = [
 def create_all_items(world: BananaManiaWorld) -> None:
     itempool: list[Item] = []
 
+    # SMB 2 worlds
     if world.options.world_structure == 0:  # progression
         itempool += [world.create_item("Progressive World Unlock") for _ in range(9)]
     else:  # worlds
         itempool += [world.create_item(name) for name in INDIVIDUAL_WORLD_UNLOCKS]
 
-    # Progression items that gate content.
+    for challenge_diff in ["casual", "normal", "expert", "master"]:
+        if getattr(world.options, f"smb1_{challenge_diff}"):
+            itempool.append(world.create_item(f"SMB1 {challenge_diff.capitalize()} Challenge Mode Unlock"))
+        if getattr(world.options, f"smb2_{challenge_diff}"):
+            itempool.append(world.create_item(f"SMB2 {challenge_diff.capitalize()} Challenge Mode Unlock"))
+
+    for special_mode in ["reverse", "dark_banana", "golden_banana", "original_stages"]:
+        if getattr(world.options, f"{special_mode}_mode"):
+            itempool.append(world.create_item(f"{" ".join(special_mode.split("_")).title()} Mode Unlock"))
+
+    if world.options.deluxe_stages:
+        if world.options.deluxe_unlock_style == 0: # all
+            itempool.append(world.create_item("Deluxe Mode Unlock"))
+        else:
+            itempool.append(world.create_item("Deluxe Beginner Stages Pack"))
+            itempool.append(world.create_item("Deluxe Advanced Stages Pack"))
+            itempool.append(world.create_item("Deluxe EX Stages Pack"))
+
+    # Gimmick items
     itempool.append(world.create_item("Normal Switches"))
     itempool.append(world.create_item("Wormholes"))
     itempool.append(world.create_item("Fast Switches"))

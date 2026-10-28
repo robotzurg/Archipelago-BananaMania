@@ -4,38 +4,18 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import TYPE_CHECKING
+from math import ceil
 
 from BaseClasses import Location
 
 from . import items
 
+from rule_builder.rules import HasAny, Rule, HasAll, Has
+
 if TYPE_CHECKING:
     from .world import BananaManiaWorld
 
-# Used if we need to collect all bananas
-ALL_BANANAS = -1
-# Rulebuilder style requirements
-Requirement = tuple["str | AnyOf", ...]
-
-
-@dataclass(frozen=True)
-class AnyOf:
-    """One requirement satisfied by ANY of several alternatives.
-
-    Each alternative is itself an AND-set, so
-    ``AnyOf("Wormholes", ("Normal Switches", "Fast Switches"))`` reads as
-    "Wormholes, OR both switch types". A bare string is shorthand for a one-item set,
-    and alternatives may nest further AnyOf groups.
-    """
-
-    alternatives: tuple[Requirement, ...]
-
-    def __init__(self, *alternatives: str | AnyOf | Sequence[str | AnyOf]) -> None:
-        object.__setattr__(self, "alternatives", tuple(
-            (alt,) if isinstance(alt, (str, AnyOf)) else tuple(alt)
-            for alt in alternatives
-        ))
-
+ALL_BANANAS = -1            # Key for needing all bananas
 
 class Difficulty(Enum):
     """Which difficulty's variant of a stage is being played."""
@@ -55,7 +35,7 @@ class MissionKind(Enum):
     RED_GOAL = ("Red Goal", 4)
     NONSTOP = ("Nonstop", 5)
     CHALLENGE_CLEAR = ("Challenge", 6) # Amount here is how many fall outs/time overs you can get
-    TURNING_POINT = ("Turning Point", 7)
+    TURNING_POINT = ("Turning Point Clear", 7)
     COMPLETE = ("Stage Complete", 8)
 
     def __init__(self, label: str, offset: int) -> None:
@@ -65,14 +45,17 @@ class MissionKind(Enum):
 
 @dataclass(frozen=True)
 class Mission:
-    """0-10 seconds means 10 seconds or under, so no items needed."""
-    seconds: int = 0                      # General time for the mission used for logic, also sets the baseline time limit time
-    seconds_int: int | None = None        # If set to none, inherits from seconds. Also is used for logic with time limit
-    seconds_exp: int | None = None        # If set to none, inherits from seconds_int, then seconds
-    amount: int | None = None             # bananas to collect, or seconds that must remain on the clock, or other things
-    items: Requirement = ()               # excludes time increases, as those are handled automatically
-    items_int: Requirement | None = None  # Inherits from standard items unless specified; () means none needed
-    items_exp: Requirement | None = None  # Inherits from items_int, then items
+    """
+    0-10 seconds means 10 seconds or under, so no items needed
+    None means "not set": side missions inherit that field from the stage's clear mission
+    """
+    seconds: int | None = None                       # General time for the mission used for logic
+    seconds_int: int | None = None                   # If set to none, inherits from seconds
+    seconds_exp: int | None = None                   # If set to none, inherits from seconds_int, then seconds
+    amount: int | None = None                        # bananas to collect, seconds for time limit, or other things. Never inherited
+    items: tuple[str | Rule, ...] | None = None      # excludes time increases, as those are handled automatically. () means none needed
+    items_int: tuple[str | Rule, ...] | None = None  # Inherits from items unless specified
+    items_exp: tuple[str | Rule, ...] | None = None  # Inherits from items_int, then items
 
 
 @dataclass(frozen=True)
@@ -81,9 +64,9 @@ class StageData:
     name: str = ""                             # in-game stage name, e.g. "Simple"
     clear: Mission = Mission()                 # For clearing, green/red goals inherit from this unless specified otherwise
     missions: dict[MissionKind, Mission] = field(default_factory=dict)
-    items: Requirement = ()                    # required by every mission on this stage
-    items_int: Requirement | None = None       # Inherits from standard items unless specified; () means none needed
-    items_exp: Requirement | None = None       # Inherits from items_int, then items
+    items: Rule = ()                    # required by every mission on this stage
+    items_int: Rule | None = None       # Inherits from standard items unless specified; () means none needed
+    items_exp: Rule | None = None       # Inherits from items_int, then items
     category: bool = False                     # Whether this is a category vs an individual stage, just changes text formatting for the name
     special: bool = False                      # Whether this is a special category or not, if special category it handles the clear mission differently
 
@@ -91,30 +74,8 @@ class StageData:
         """Every check this stage offers, in ID order. Stage Clear uses the Standard entry."""
         return [(MissionKind.CLEAR, self.clear), *self.missions.items()]
 
-
-def resolve_items(source: Mission | StageData, difficulty: Difficulty = Difficulty.STANDARD) -> Requirement:
-    """The item requirement of one mission or stage on the given difficulty."""
-    if difficulty is Difficulty.EXPERT and source.items_exp is not None:
-        return source.items_exp
-    if difficulty in (Difficulty.INTERMEDIATE, Difficulty.EXPERT) and source.items_int is not None:
-        return source.items_int
-    return source.items
-
-
-def resolve_seconds(mission: Mission, difficulty: Difficulty = Difficulty.STANDARD) -> int:
-    """The time a mission needs on the given difficulty, with the same Expert -> Intermediate fallback."""
-    if difficulty is Difficulty.EXPERT and mission.seconds_exp is not None:
-        return mission.seconds_exp
-    if difficulty in (Difficulty.INTERMEDIATE, Difficulty.EXPERT) and mission.seconds_int is not None:
-        return mission.seconds_int
-    return mission.seconds
-
-
-def mission_items(
-    stage: StageData, mission: Mission, difficulty: Difficulty = Difficulty.STANDARD
-) -> Requirement:
-    """Everything needed for one check: the stage-wide items plus the mission's own."""
-    return (*resolve_items(stage, difficulty), *resolve_items(mission, difficulty))
+    def is_challenge(self) -> bool:
+        return 11000 <= self.base_id < 12000
 
 # Data collected from this sheet, big shoutout to Friday and their friend for gathering the logic: 
 # https://docs.google.com/spreadsheets/d/1xcdeANx_rk76uNjpTzSDubAzXn7za5Z9SlGcoUx4BC0/edit?usp=sharing
@@ -140,7 +101,7 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(31, name="Switches", clear=Mission(), items=("Normal Switches",), missions={
             MissionKind.BANANAS:    Mission(amount=25, seconds=20, items=("Normal Switches",)),
             MissionKind.TIME_LIMIT: Mission(amount=10, items=("Normal Switches",)),
-            MissionKind.GREEN_GOAL: Mission(items=("Normal Switches",)),
+            MissionKind.GREEN_GOAL: Mission(seconds=20, items=("Normal Switches",)),
         }),
         StageData(41, name="Conveyors", clear=Mission(), missions={
             MissionKind.BANANAS:    Mission(amount=30, seconds=20),
@@ -270,7 +231,7 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(301, name="Pro Skaters", clear=Mission(), items=("Pause Switches",), items_int=(), items_exp=(), missions={
             MissionKind.BANANAS:    Mission(amount=20, seconds=30, items=("Pause Switches",)),
             MissionKind.TIME_LIMIT: Mission(amount=10, items=("Pause Switches",)),
-            MissionKind.GREEN_GOAL: Mission(items=("Pause Switches",)),
+            MissionKind.GREEN_GOAL: Mission(items=()),
         }),
         StageData(311, name="Giant Comb", clear=Mission(seconds=28, seconds_int=12, seconds_exp=0), missions={
             MissionKind.BANANAS:    Mission(amount=15, seconds=30),
@@ -293,18 +254,18 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(351, name="Launchers", clear=Mission(seconds=28, seconds_int=18), missions={
             MissionKind.BANANAS:    Mission(amount=10, seconds=50),
             MissionKind.TIME_LIMIT: Mission(amount=20),
-            MissionKind.GREEN_GOAL: Mission(),
+            MissionKind.GREEN_GOAL: Mission(seconds=20),
         }),
         StageData(361, name="Randomizer", clear=Mission(seconds=14, seconds_int=11, seconds_exp=0), missions={
             MissionKind.BANANAS:    Mission(amount=35, seconds=20),
             MissionKind.TIME_LIMIT: Mission(amount=15),
-            MissionKind.GREEN_GOAL: Mission(),
-            MissionKind.RED_GOAL:   Mission(),
+            MissionKind.GREEN_GOAL: Mission(seconds=20),
+            MissionKind.RED_GOAL:   Mission(seconds=20),
         }),
         StageData(371, name="Coin Slots", clear=Mission(seconds=26, seconds_int=11), missions={
             MissionKind.BANANAS:    Mission(amount=ALL_BANANAS, seconds=30),
             MissionKind.TIME_LIMIT: Mission(amount=30),
-            MissionKind.GREEN_GOAL: Mission(),
+            MissionKind.GREEN_GOAL: Mission(seconds=20),
         }),
         StageData(381, name="Seesaw Bridges", clear=Mission(seconds=48, seconds_int=38, seconds_exp=29), missions={
             MissionKind.BANANAS:    Mission(amount=40, seconds=50),
@@ -326,7 +287,7 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(411, name="Free Fall", clear=Mission(seconds=18, seconds_exp=0), missions={
             MissionKind.BANANAS:    Mission(amount=50, seconds=50),
             MissionKind.TIME_LIMIT: Mission(amount=20),
-            MissionKind.GREEN_GOAL: Mission(),
+            MissionKind.GREEN_GOAL: Mission(seconds=30, seconds_int=30, seconds_exp=20),
         }),
         StageData(421, name="Melting Pot", clear=Mission(), missions={
             MissionKind.BANANAS:    Mission(amount=10),
@@ -343,8 +304,8 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(451, name="Jump Machine", clear=Mission(seconds=12), missions={
             MissionKind.BANANAS:    Mission(amount=25, seconds=40),
             MissionKind.TIME_LIMIT: Mission(amount=15),
-            MissionKind.GREEN_GOAL: Mission(),
-            MissionKind.RED_GOAL:   Mission(),
+            MissionKind.GREEN_GOAL: Mission(seconds=30),
+            MissionKind.RED_GOAL:   Mission(seconds=40),
         }),
         StageData(461, name="Zigzag Slope", clear=Mission(seconds=17), missions={
             MissionKind.BANANAS:    Mission(amount=25, seconds=30),
@@ -373,7 +334,7 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(511, name="Punched Seesaws", clear=Mission(), missions={
             MissionKind.BANANAS:    Mission(amount=21, seconds=30),
             MissionKind.TIME_LIMIT: Mission(amount=10),
-            MissionKind.GREEN_GOAL: Mission(),
+            MissionKind.GREEN_GOAL: Mission(seconds=30),
         }),
         StageData(521, name="Opera", clear=Mission(seconds=45, seconds_int=34, seconds_exp=29), missions={
             MissionKind.BANANAS:    Mission(amount=70, seconds=60),
@@ -386,8 +347,8 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(541, name="Tiers", clear=Mission(seconds=16), items=("Wormholes",), missions={
             MissionKind.BANANAS:    Mission(amount=20, seconds=40, items=("Wormholes",)),
             MissionKind.TIME_LIMIT: Mission(amount=30, items=("Wormholes",)),
-            MissionKind.GREEN_GOAL: Mission(items=("Wormholes",)),
-            MissionKind.RED_GOAL:   Mission(items=("Wormholes",)),
+            MissionKind.GREEN_GOAL: Mission(seconds=30, items=("Wormholes",)),
+            MissionKind.RED_GOAL:   Mission(seconds=20, items=("Wormholes",)),
         }),
         StageData(551, name="Cliffs", clear=Mission(seconds=29, seconds_int=19, seconds_exp=0), missions={
             MissionKind.BANANAS:    Mission(amount=20, seconds=30),
@@ -398,11 +359,10 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
             MissionKind.TIME_LIMIT: Mission(amount=20),
         }),
         StageData(571, name="Detours", clear=Mission(seconds=11, seconds_int=0), items=("Wormholes",), items_int=("Wormholes",), items_exp=(), missions={
-            MissionKind.BANANAS:    Mission(amount=20, seconds=20, items=("Wormholes",)),
+            MissionKind.BANANAS:    Mission(amount=20, seconds=20, seconds_int=0, items=("Wormholes",)),
             MissionKind.TIME_LIMIT: Mission(amount=15, items=("Wormholes",)),
-            MissionKind.GREEN_GOAL: Mission(items=("Wormholes",)),
+            MissionKind.GREEN_GOAL: Mission(seconds=20, seconds_int=20, seconds_exp=0, items=("Wormholes",), items_exp=()),
         }),
-        # TODO: source data lists "Play Switch" for the banana mission; there is no such item in items.py yet.
         StageData(581, name="Switch Inferno", clear=Mission(), items=("Normal Switches",), missions={
             MissionKind.BANANAS:    Mission(amount=9, items=("Normal Switches",)),
             MissionKind.TIME_LIMIT: Mission(amount=15, items=("Normal Switches",)),
@@ -452,8 +412,8 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(681, name="8 Bracelets", clear=Mission(seconds=21), missions={
             MissionKind.BANANAS:    Mission(amount=10, seconds=30),
             MissionKind.TIME_LIMIT: Mission(amount=25),
-            MissionKind.GREEN_GOAL: Mission(),
-            MissionKind.RED_GOAL:   Mission(),
+            MissionKind.GREEN_GOAL: Mission(seconds=30),
+            MissionKind.RED_GOAL:   Mission(seconds=30),
         }),
         StageData(691, name="Quick Turn", clear=Mission(), items=("Fast Switches",), missions={
             MissionKind.BANANAS:    Mission(amount=ALL_BANANAS),
@@ -468,7 +428,7 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
             MissionKind.BANANAS:    Mission(amount=20, seconds=30),
             MissionKind.TIME_LIMIT: Mission(amount=20),
         }),
-        StageData(711, name="Soft Cream", clear=Mission(seconds=17, seconds_int=13, seconds_exp=0), items=("Normal Switches",), items_int=(AnyOf("Normal Switches", "Fast Switches"),), items_exp=(AnyOf("Normal Switches", "Fast Switches"),), missions={
+        StageData(711, name="Soft Cream", clear=Mission(seconds=17, seconds_int=13, seconds_exp=0), items=("Normal Switches",), items_int=(HasAny("Normal Switches", "Fast Switches"),), items_exp=(HasAny("Normal Switches", "Fast Switches"),), missions={
             MissionKind.BANANAS:    Mission(amount=16, seconds=20, items=("Normal Switches",)),
             MissionKind.TIME_LIMIT: Mission(amount=20, items=("Normal Switches",)),
         }),
@@ -479,7 +439,7 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(731, name="Entangled Path", clear=Mission(seconds=41, seconds_int=31, seconds_exp=30), items=("Normal Switches", "Fast Switches"), items_int=("Normal Switches", "Fast Switches"), items_exp=(), missions={
             MissionKind.BANANAS:    Mission(amount=30, seconds=50, items=("Normal Switches", "Fast Switches")),
             MissionKind.TIME_LIMIT: Mission(amount=40, items=("Normal Switches", "Fast Switches")),
-            MissionKind.GREEN_GOAL: Mission(items=("Normal Switches", "Fast Switches")),
+            MissionKind.GREEN_GOAL: Mission(seconds=40, items=("Normal Switches", "Fast Switches")),
         }),
         StageData(741, name="Totters", clear=Mission(), missions={
             MissionKind.BANANAS:    Mission(amount=28),
@@ -488,12 +448,12 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(751, name="Vortex", clear=Mission(seconds=27, seconds_int=18), missions={
             MissionKind.BANANAS:    Mission(amount=10, seconds=40),
             MissionKind.TIME_LIMIT: Mission(amount=30),
-            MissionKind.GREEN_GOAL: Mission(),
+            MissionKind.GREEN_GOAL: Mission(seconds=30),
         }),
         StageData(761, name="Warp", clear=Mission(seconds=27), missions={
             MissionKind.BANANAS:    Mission(amount=10, seconds=50),
             MissionKind.TIME_LIMIT: Mission(amount=40),
-            MissionKind.GREEN_GOAL: Mission(),
+            MissionKind.GREEN_GOAL: Mission(seconds=40),
         }),
         StageData(771, name="Trampolines", clear=Mission(seconds=29, seconds_int=16), missions={
             MissionKind.BANANAS:    Mission(amount=40, seconds=30),
@@ -515,7 +475,7 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(801, name="Serial Jump", clear=Mission(), missions={
             MissionKind.BANANAS:    Mission(amount=10, seconds=20),
             MissionKind.TIME_LIMIT: Mission(amount=15),
-            MissionKind.GREEN_GOAL: Mission(),
+            MissionKind.GREEN_GOAL: Mission(seconds=20),
             MissionKind.RED_GOAL:   Mission(),
         }),
         StageData(811, name="Cross Floors", clear=Mission(seconds=14), missions={
@@ -529,7 +489,7 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(831, name="Chipped Pipes", clear=Mission(seconds=15, seconds_int=0), missions={
             MissionKind.BANANAS:    Mission(amount=20, seconds=20),
             MissionKind.TIME_LIMIT: Mission(amount=15),
-            MissionKind.GREEN_GOAL: Mission(),
+            MissionKind.GREEN_GOAL: Mission(seconds=20),
         }),
         StageData(841, name="Flat Maze", clear=Mission(seconds=56, seconds_int=39, seconds_exp=22), missions={
             MissionKind.BANANAS:    Mission(amount=20, seconds=60),
@@ -860,7 +820,7 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
         StageData(11629, name="8 Bracelets",      clear=Mission(seconds=21)),
         StageData(11630, name="Banana Hunting",   clear=Mission()),
         StageData(11631, name="Pistons",          clear=Mission(seconds=27, seconds_int=16)),
-        StageData(11632, name="Soft Cream",       clear=Mission(seconds=17, seconds_int=13, seconds_exp=0, items=("Normal Switches",), items_int=(AnyOf("Normal Switches", "Fast Switches"),), items_exp=(AnyOf("Normal Switches", "Fast Switches"),))),
+        StageData(11632, name="Soft Cream",       clear=Mission(seconds=17, seconds_int=13, seconds_exp=0, items=("Normal Switches",), items_int=(HasAny("Normal Switches", "Fast Switches"),), items_exp=(HasAny("Normal Switches", "Fast Switches"),))),
         StageData(11633, name="Momentum",         clear=Mission()),
         StageData(11634, name="Entangled Path",   clear=Mission(seconds=41, seconds_int=31, seconds_exp=30, items=("Normal Switches", "Fast Switches"), items_int=("Normal Switches", "Fast Switches"), items_exp=())),
         StageData(11635, name="Totters",          clear=Mission()),
@@ -1089,9 +1049,9 @@ def labeled_stages(group: str) -> list[tuple[str, StageData]]:
     labeled = []
     number = 0
     for stage in STAGE_GROUPS[group]:
-        if stage.special:
+        if stage.category:
             labeled.append((f"[{group}]", stage))
-        elif stage.category:
+        elif group.startswith(("SMB1", "SMB2", "SP")):
             labeled.append((f"[{group}]", stage))
         else:
             number += 1
@@ -1100,29 +1060,42 @@ def labeled_stages(group: str) -> list[tuple[str, StageData]]:
 
 
 def location_name(label: str, stage: StageData, kind: MissionKind, mission: Mission) -> str:
-    """Build the display name"""
+    """Build the display name for stages/categories"""
     # Categories only show their group label, not the stage name
     prefix = f"{label} {stage.name} -" if stage.name and not stage.category else label
 
     if kind is MissionKind.BANANAS and mission.amount == ALL_BANANAS:
         return f"{prefix} Banana Complete"
-    if stage.category and kind is MissionKind.CLEAR:
-        return f"{prefix} Course Clear"
+    if stage.category and stage.special == False:
+        if kind is MissionKind.CLEAR:
+            return f"{prefix} Course Clear"
+        elif kind is MissionKind.CHALLENGE_CLEAR:
+            return f"{prefix} {kind.label} {mission.amount}"
+    if stage.category and stage.special == True:
+        return f"{prefix} {kind.label}"
     if mission.amount is not None:
         return f"{prefix} {kind.label} {mission.amount}"
     return f"{prefix} {kind.label}"
 
+@dataclass(frozen=True)
+class LocationData:
+    stage: StageData
+    kind: MissionKind
+    mission: Mission
 
-LOCATION_NAME_TO_ID: dict[str, int] = {
-    **{
-        location_name(label, stage, kind, mission): stage.base_id + kind.offset
-        for group in STAGE_GROUPS
-        for label, stage in labeled_stages(group)
-        for kind, mission in stage.all_missions()
-    },
-    # **SHOP_LOCATION_NAME_TO_ID,
+LOCATION_NAME_TO_DATA: dict[str, LocationData] = {
+    location_name(label, stage, kind, mission): LocationData(stage, kind, mission)
+    for group in STAGE_GROUPS
+    for label, stage in labeled_stages(group)
+    for kind, mission in stage.all_missions()
 }
 
+LOCATION_NAME_TO_ID: dict[str, int] = {
+    location_name(label, stage, kind, mission): stage.base_id + kind.offset
+    for group in STAGE_GROUPS
+    for label, stage in labeled_stages(group)
+    for kind, mission in stage.all_missions()
+}
 
 def get_location_names_with_ids(location_names: list[str]) -> dict[str, int | None]:
     return {location_name: LOCATION_NAME_TO_ID[location_name] for location_name in location_names}
@@ -1180,9 +1153,9 @@ def create_regular_locations(world: BananaManiaWorld) -> None:
     # Special Modes
     if world.options.deluxe_stages:
         create_mission_locations(world, "Deluxe Mode", "SP DX")
-        create_mission_locations(world, "Deluxe Mode", "SP DX Beginner")
-        create_mission_locations(world, "Deluxe Mode", "SP DX Advanced")
-        create_mission_locations(world, "Deluxe Mode", "SP DX EX")
+        create_mission_locations(world, "Deluxe Beginner Pack", "SP DX Beginner")
+        create_mission_locations(world, "Deluxe Advanced Pack", "SP DX Advanced")
+        create_mission_locations(world, "Deluxe EX Pack", "SP DX EX")
 
     if world.options.reverse_mode:
         create_mission_locations(world, "Reverse Mode", "SP Reverse")

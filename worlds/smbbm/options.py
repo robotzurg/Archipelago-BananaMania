@@ -67,7 +67,6 @@ class LogicDifficulty(Choice):
 class Smb1CasualChallengeMode(DefaultOnToggle):
     """
     Include SMB1 Casual difficulty challenge mode in logic.
-    Adds 2 checks.
     """
     
     display_name = "SMB1 Casual Challenge Mode Stages"
@@ -75,7 +74,6 @@ class Smb1CasualChallengeMode(DefaultOnToggle):
 class Smb1NormalChallengeMode(DefaultOnToggle):
     """
     Include SMB1 Normal difficulty challenge mode in logic.
-    Adds 2 checks.
     """
     
     display_name = "SMB1 Normal Challenge Mode Stages"
@@ -83,7 +81,6 @@ class Smb1NormalChallengeMode(DefaultOnToggle):
 class Smb1ExpertChallengeMode(Toggle):
     """
     Include SMB1 Expert difficulty challenge mode in logic.
-    Adds 2 checks.
     """
     
     display_name = "SMB1 Expert Challenge Mode Stages"
@@ -91,7 +88,6 @@ class Smb1ExpertChallengeMode(Toggle):
 class Smb1MasterChallengeMode(Toggle):
     """
     Include SMB1 Master difficulty challenge mode in logic.
-    Adds 2 checks.
     """
     
     display_name = "SMB1 Master Challenge Mode Stages"
@@ -107,7 +103,7 @@ class DeluxeUnlockStyle(Choice):
     """
     How the Deluxe stages should be unlocked.
     all: Unlock all deluxe stages at once when sent the Deluxe Stages unlock.
-    packs: Unlock the deluxe stages in packs, with 4 total packs added to the item pool.
+    packs: Unlock the deluxe stages in packs, with 3 total packs added to the item pool.
     Does nothing if deluxe stages are disabled.
     """
     
@@ -149,7 +145,6 @@ class OriginalStagesMode(Toggle):
 class Smb2CasualExChallengeMode(Toggle):
     """
     Include the SMB2 Casual EX Challenge Mode stages in logic.
-    Adds 2 checks.
     """
     
     display_name = "SMB2 Casual EX Challenge Mode Stages"
@@ -157,7 +152,6 @@ class Smb2CasualExChallengeMode(Toggle):
 class Smb2NormalExChallengeMode(Toggle):
     """
     Include the SMB2 Normal EX Challenge Mode stages in logic.
-    Adds 2 checks.
     """
     
     display_name = "SMB2 Normal EX Challenge Mode Stages"
@@ -165,7 +159,6 @@ class Smb2NormalExChallengeMode(Toggle):
 class Smb2ExpertExChallengeMode(Toggle):
     """
     Include the SMB2 Expert EX Challenge Mode stages in logic.
-    Adds 2 checks.
     """
     
     display_name = "SMB2 Expert EX Challenge Mode Stages"
@@ -173,7 +166,6 @@ class Smb2ExpertExChallengeMode(Toggle):
 class Smb2MasterExChallengeMode(Toggle):
     """
     Include the SMB2 Master EX Challenge Mode stages in logic.
-    Adds 2 checks.
     """
     
     display_name = "SMB2 Master EX Challenge Mode Stages"

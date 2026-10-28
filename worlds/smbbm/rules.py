@@ -1,19 +1,22 @@
 from __future__ import annotations
 
-import math
-import re
+from dataclasses import replace
 from typing import TYPE_CHECKING
-from rule_builder.rules import Has
+from rule_builder.rules import Has, True_, HasAny, Rule
+from math import ceil
 
-from .locations import AnyOf, Requirement
+from .locations import Difficulty, Mission, MissionKind, StageData, LOCATION_NAME_TO_DATA
+from .regions import WORLD_REGIONS
+
+STARTING_TIME = 10          # Amount of time you start with
+PROG_INCREASE_TIME = 10     # Amount of time each prog time increase gives
 
 if TYPE_CHECKING:
     from BaseClasses import CollectionState
 
     from .world import BananaManiaWorld
 
-STAGE_UNLOCK_NAMES = [
-    "World 1: Jungle Island Unlock",           # World 1
+SMB2_WORLD_UNLOCK_NAMES = [
     "World 2: Volcanic Magma Unlock",          # World 2
     "World 3: Under the Ocean Unlock",         # World 3
     "World 4: Inside a Whale Unlock",          # World 4
@@ -25,23 +28,79 @@ STAGE_UNLOCK_NAMES = [
     "World 10: Dr. Bad-Boon's Base Unlock",    # World 10
 ]
 
+SECONDS_FIELDS = ("seconds", "seconds_int", "seconds_exp")
+ITEMS_FIELDS = ("items", "items_int", "items_exp")
 
-def has_requirement(state: CollectionState, player: int, requirement: Requirement) -> bool:
-    """True when every term of the requirement is satisfied. AnyOf terms need one alternative."""
-    return all(_has_term(state, player, term) for term in requirement)
+def _owns(mission: Mission, fields: tuple[str, ...]) -> bool:
+    """True if the mission set any difficulty level of this field itself."""
+    return any(getattr(mission, name) is not None for name in fields)
 
+def effective_mission(stage: StageData, mission_kind: MissionKind, mission: Mission) -> Mission:
+    """
+    Handles inheriting rules from the clear mission, so that we don't have to duplicate rules
+    in other places. Returns a mission with added rules from the stage clear.
+    """
+    clear = stage.clear
+    if mission_kind is not MissionKind.CLEAR:
+        if not _owns(mission, SECONDS_FIELDS):
+            mission = replace(mission, **{name: getattr(clear, name) for name in SECONDS_FIELDS})
+        if not _owns(mission, ITEMS_FIELDS):
+            mission = replace(mission, **{name: getattr(clear, name) for name in ITEMS_FIELDS})
 
-def _has_term(state: CollectionState, player: int, term: str | AnyOf) -> bool:
-    if isinstance(term, AnyOf):
-        return any(has_requirement(state, player, alt) for alt in term.alternatives)
-    return state.has(term, player)
+    # The Standard value is the end of every difficulty chain, so it must be a real value
+    if mission.seconds is None:
+        mission = replace(mission, seconds=0)
+    if mission.items is None:
+        mission = replace(mission, items=())
+    return mission
 
+def resolve_items(source: Mission | StageData, difficulty: Difficulty = Difficulty.STANDARD) -> tuple[str | Rule, ...]:
+    """The item requirement of one mission or stage on the given difficulty."""
+    if difficulty is Difficulty.EXPERT and source.items_exp is not None:
+        return source.items_exp
+    if difficulty in (Difficulty.INTERMEDIATE, Difficulty.EXPERT) and source.items_int is not None:
+        return source.items_int
+    return source.items
+
+def resolve_seconds(mission: Mission, mission_kind: MissionKind, difficulty: Difficulty = Difficulty.STANDARD) -> int:
+    """The time a mission needs on the given difficulty, with the same Expert -> Intermediate fallback."""
+    if difficulty is Difficulty.EXPERT and mission.seconds_exp is not None:
+        seconds = mission.seconds_exp
+    elif difficulty in (Difficulty.INTERMEDIATE, Difficulty.EXPERT) and mission.seconds_int is not None:
+        seconds = mission.seconds_int
+    else:
+        seconds = mission.seconds
+
+    if mission_kind is MissionKind.TIME_LIMIT:
+        seconds = min(seconds, mission.amount)
+    return seconds
+
+def items_to_rule(requirement) -> Rule:
+    rule: Rule = True_()
+    for term in requirement:
+        rule = rule & (term if isinstance(term, Rule) else Has(term))
+    return rule
+
+def get_mission_rule(
+    stage: StageData, mission: Mission, mission_kind: MissionKind, difficulty: Difficulty = Difficulty.STANDARD
+) -> Rule:
+    """Returns a rule with everything the mission/stage needs."""
+    rule: Rule = True_()
+    mission = effective_mission(stage, mission_kind, mission)
+
+    # Handle prog time increase item rules
+    seconds = resolve_seconds(mission, mission_kind, difficulty)
+    time_needed = max(0, ceil((seconds - STARTING_TIME) / PROG_INCREASE_TIME))
+    if time_needed:
+        rule = rule & Has("Progressive Time Increase", time_needed)
+
+    rule = rule & items_to_rule(resolve_items(stage, difficulty)) & items_to_rule(resolve_items(mission, difficulty))
+    return rule
 
 def set_all_rules(world: BananaManiaWorld) -> None:
     set_all_entrance_rules(world)
     set_all_location_rules(world)
     set_completion_condition(world)
-
 
 def set_all_entrance_rules(world: BananaManiaWorld) -> None:
     for world_num in range(2, 11):
@@ -49,23 +108,30 @@ def set_all_entrance_rules(world: BananaManiaWorld) -> None:
         if world.options.world_structure == 0:  # progression
             world.set_rule(entrance, Has("Progressive World Unlock", world_num - 1))
         else:  # individual
-            unlock_name = STAGE_UNLOCK_NAMES[world_num - 1]
+            unlock_name = SMB2_WORLD_UNLOCK_NAMES[world_num - 2]
             world.set_rule(entrance, Has(unlock_name))
-
+    
+    # We handle SMB2 world regions above, so skip those
+    for region_idx in range(10, len(WORLD_REGIONS)):
+        region = WORLD_REGIONS[region_idx]
+        entrance = world.get_entrance(f"Menu to {region}")
+        if "SMB1" in region or "SMB2" in region:
+            world.set_rule(entrance, Has(f"{region} Challenge Mode Unlock"))
+        elif region == "Deluxe Mode":
+            world.set_rule(entrance, HasAny("Deluxe Mode Unlock", "Deluxe Beginner Stages Pack", "Deluxe Advanced Stages Pack", "Deluxe EX Stages Pack"))
+        elif "Deluxe" in region: # Pack entrance logic
+            world.set_rule(entrance, HasAny("Deluxe Mode Unlock", f"Deluxe {region.split(' ')[1]} Stages Pack"))
+        else:
+            world.set_rule(entrance, Has(f"{region} Unlock"))
 
 def set_all_location_rules(world: BananaManiaWorld) -> None:
+    difficulty = list(Difficulty)[world.options.logic_difficulty.value]
     for location in world.multiworld.get_locations(world.player):
-        name = location.name
-
-        # Time Limit logic, you start with 10 seconds
-        time_match = re.search(r"Time Limit (\d+)", name)
-        if time_match:
-            limit = int(time_match.group(1))
-            upgrades = math.ceil((limit - 10) / 10)
-            if upgrades > 0:
-                world.set_rule(location, Has("Progressive Time Increase", upgrades))
+        data = LOCATION_NAME_TO_DATA.get(location.name)
+        if data is None:
             continue
 
+        world.set_rule(location, get_mission_rule(data.stage, data.mission, data.kind, difficulty))
 
 def set_completion_condition(world: BananaManiaWorld) -> None:
     world.set_completion_rule(Has("Victory"))
