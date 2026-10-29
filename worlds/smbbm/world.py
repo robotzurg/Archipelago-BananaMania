@@ -36,6 +36,11 @@ class BananaManiaWorld(World):
         return region_index * 1_000_000 + location_id
 
     def generate_early(self) -> None:
+
+        enabled = sum(bool(getattr(self.options, f"smb{g}_{d}"))
+                    for g in (1, 2) for d in ("casual", "normal", "expert", "master"))
+        self.options.goal_challenge_modes.value = min(enabled, self.options.goal_challenge_modes.value)
+
         passthrough = getattr(self.multiworld, "re_gen_passthrough", {})
         if self.game in passthrough:
             for key, value in passthrough[self.game].items():
@@ -61,6 +66,7 @@ class BananaManiaWorld(World):
 
     def fill_slot_data(self) -> Mapping[str, Any]:
         return self.options.as_dict(
+            "goal_worlds", "goal_challenge_modes",
             "banana_missions", "time_missions", "extra_goals", "nonstop_missions", "world_structure",
             "logic_difficulty", "smb1_casual", "smb1_normal", "smb1_expert", "smb1_master", 
             "smb2_casual", "smb2_normal", "smb2_expert", "smb2_master", "deluxe_stages",

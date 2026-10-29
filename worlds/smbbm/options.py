@@ -2,6 +2,28 @@ from dataclasses import dataclass
 
 from Options import Choice, OptionGroup, PerGameCommonOptions, Range, Toggle, DefaultOnToggle
 
+class GoalWorlds(Range):
+    """
+    How many SMB2 adventure worlds you are expected to fully complete in order to goal.
+    """
+    range_start = 3
+    range_end = 10
+    default = 5
+
+    display_name = "Goal Worlds"
+
+class GoalChallengeModes(Range):
+    """
+    How many challenge modes you are expected to fully complete in order to goal.
+    Ignored if no challenge modes are enabled, and forcefully lowered to whatever your max challenge modes
+    enabled is.
+    """
+    range_start = 0
+    range_end = 8
+    default = 4
+
+    display_name = "Goal Challenge Modes"
+
 class IncludeBananaMissions(Toggle):
     """
     Includes the Banana Collect Missions. These are more difficult.
@@ -173,6 +195,8 @@ class Smb2MasterExChallengeMode(Toggle):
 
 @dataclass
 class BananaManiaOptions(PerGameCommonOptions):
+    goal_worlds: GoalWorlds
+    goal_challenge_modes: GoalChallengeModes
     banana_missions: IncludeBananaMissions
     time_missions: IncludeTimeMissions
     extra_goals: IncludeExtraGoals
@@ -195,6 +219,10 @@ class BananaManiaOptions(PerGameCommonOptions):
     smb2_master: Smb2MasterExChallengeMode
 
 option_groups = [
+    OptionGroup(
+        "Goal Options",
+        [GoalWorlds, GoalChallengeModes],
+    ),
     OptionGroup(
         "Mission Options",
         [IncludeBananaMissions, IncludeTimeMissions, IncludeExtraGoals, IncludeNonstopMissions],

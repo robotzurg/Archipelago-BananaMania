@@ -2,14 +2,15 @@ from __future__ import annotations
 
 from dataclasses import replace
 from typing import TYPE_CHECKING
-from rule_builder.rules import Has, True_, HasAny, Rule
+from rule_builder.rules import AtLeast, CanReachRegion, Has, True_, HasAny, Rule
 from math import ceil
 
-from .locations import Difficulty, Mission, MissionKind, StageData, LOCATION_NAME_TO_DATA
+from .locations import STAGE_GROUPS, Difficulty, Mission, MissionKind, StageData, LOCATION_NAME_TO_DATA
 from .regions import WORLD_REGIONS
 
 STARTING_TIME = 10          # Amount of time you start with
 PROG_INCREASE_TIME = 10     # Amount of time each prog time increase gives
+CHALLENGE_REGIONS = WORLD_REGIONS[10:18] # The regions related to challenges
 
 if TYPE_CHECKING:
     from BaseClasses import CollectionState
@@ -97,6 +98,29 @@ def get_mission_rule(
     rule = rule & items_to_rule(resolve_items(stage, difficulty)) & items_to_rule(resolve_items(mission, difficulty))
     return rule
 
+def get_all_region_clear_rules(world: BananaManiaWorld, region: str, difficulty: Difficulty = Difficulty.STANDARD):
+    """Returns a rule that includes all required mission rules for a region."""
+    rule: Rule = True_()
+    group = region
+    if "World" in region:
+        group = f"W{region.split(' ')[1]}"
+    for stage in STAGE_GROUPS[group]:
+        rule = rule & get_mission_rule(stage, stage.clear, MissionKind.CLEAR, difficulty)
+    return rule & CanReachRegion(region)
+
+def get_challenge_mode_clear_logic(world: BananaManiaWorld, region: str, selected_stage: StageData, difficulty: Difficulty = Difficulty.STANDARD):
+    """Returns a rule that includes all required rules for a challenge mode level"""
+    rule: Rule = True_()
+    if not selected_stage.is_challenge():
+        raise ValueError(f"{selected_stage.name} is not a challenge mode stage!")
+    for stage in STAGE_GROUPS[region]:
+        if stage.category:
+            continue
+        rule = rule & get_mission_rule(stage, stage.clear, MissionKind.CLEAR, difficulty)
+        if stage is selected_stage:
+            break
+    return rule
+
 def set_all_rules(world: BananaManiaWorld) -> None:
     set_all_entrance_rules(world)
     set_all_location_rules(world)
@@ -131,7 +155,47 @@ def set_all_location_rules(world: BananaManiaWorld) -> None:
         if data is None:
             continue
 
-        world.set_rule(location, get_mission_rule(data.stage, data.mission, data.kind, difficulty))
+        rule = get_mission_rule(data.stage, data.mission, data.kind, difficulty)
+        region = location.parent_region.name
+
+        if data.stage.is_challenge():
+            rule = get_challenge_mode_clear_logic(world, region, data.stage, difficulty)
+        elif data.stage.category and region in CHALLENGE_REGIONS: # You have to be able to reach the end to get these
+            last = STAGE_GROUPS[region][-1]
+            rule = (get_challenge_mode_clear_logic(world, region, last, difficulty)
+                    & get_mission_rule(data.stage, data.mission, data.kind, difficulty))
+
+        if data.stage.special and data.stage.category:
+            # Deluxe Mode's stages live in the pack regions, everything else holds its own stages
+            if region == "Deluxe Mode":
+                groups = [(f"Deluxe {pack} Pack", f"SP DX {pack}") for pack in ("Beginner", "Advanced", "EX")]
+            else:
+                groups = [(region, f"SP {region.split(' ')[0]}")]
+
+            special_stage_rules = []
+            for stage_region, group in groups:
+                for stage in STAGE_GROUPS[group]:
+                    if stage.category:
+                        continue
+                    special_stage_rules.append(get_mission_rule(stage, stage.clear, MissionKind.CLEAR, difficulty) & CanReachRegion(stage_region))
+            rule = AtLeast(data.mission.amount, *special_stage_rules) & get_mission_rule(data.stage, data.mission, data.kind, difficulty)
+
+        world.set_rule(location, rule)
+
+def setup_goal_rules(world: BananaManiaWorld) -> Rule:
+    difficulty = list(Difficulty)[world.options.logic_difficulty.value]
+
+    smb2_world_rules = []
+    for smb2_world_region in WORLD_REGIONS[0:10]:
+        smb2_world_rules.append(get_all_region_clear_rules(world, smb2_world_region, difficulty))
+
+    challenge_mode_rules = []
+    if world.options.goal_challenge_modes > 0:
+        for challenge_region in WORLD_REGIONS[10:18]:
+            challenge_mode_rules.append(get_all_region_clear_rules(world, challenge_region, difficulty))
+
+    return AtLeast(world.options.goal_worlds.value, *smb2_world_rules) & AtLeast(world.options.goal_challenge_modes.value, *challenge_mode_rules)
 
 def set_completion_condition(world: BananaManiaWorld) -> None:
+    world.set_rule(world.get_location("Goal"), setup_goal_rules(world))
     world.set_completion_rule(Has("Victory"))

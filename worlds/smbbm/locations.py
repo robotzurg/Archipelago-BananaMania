@@ -1,16 +1,14 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import TYPE_CHECKING
-from math import ceil
 
 from BaseClasses import Location
 
 from . import items
 
-from rule_builder.rules import HasAny, Rule, HasAll, Has
+from rule_builder.rules import HasAny, Rule
 
 if TYPE_CHECKING:
     from .world import BananaManiaWorld
@@ -79,9 +77,6 @@ class StageData:
 
 # Data collected from this sheet, big shoutout to Friday and their friend for gathering the logic: 
 # https://docs.google.com/spreadsheets/d/1xcdeANx_rk76uNjpTzSDubAzXn7za5Z9SlGcoUx4BC0/edit?usp=sharing
-
-# TODO:
-# Add entries for SMB1/SMB2 challenge mode individual stages
 
 STAGE_GROUPS: dict[str, list[StageData]] = {
     # World 1 - Jungle Island
@@ -1169,10 +1164,12 @@ def create_regular_locations(world: BananaManiaWorld) -> None:
     if world.options.original_stages_mode:
         create_mission_locations(world, "Original Stages Mode", "SP Original")
 
+def create_location_groups(world: BananaManiaWorld) -> None:
+    world.location
+
+
 def create_events(world: BananaManiaWorld) -> None:
-    # Temporary goal
-    world_10 = world.get_region("World 10")
-    world_10.add_event(
-        "Cleared World 10", "Victory", location_type=BananaManiaLocation, item_type=items.BananaManiaItem
+    menu = world.get_region("Menu")
+    menu.add_event(
+        "Goal", "Victory", location_type=BananaManiaLocation, item_type=items.BananaManiaItem
     )
-    pass
