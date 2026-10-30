@@ -13,6 +13,14 @@ from rule_builder.rules import HasAny, Rule
 if TYPE_CHECKING:
     from .world import BananaManiaWorld
 
+"""
+NOTICE:
+This is the big one. I will be perfectly honest, if you're gonna rewrite any file, this is probably the one.
+MissionKind, Difficulty, Mission, StageData, and STAGE_GROUPS as datastructures/classes were all written and setup via the AI.
+I made a multitude of manual human edits to these, but the basis is AI.
+I will add more comments below with "NOTICE:" for other ones.
+"""
+
 ALL_BANANAS = -1            # Key for needing all bananas
 
 class Difficulty(Enum):
@@ -77,6 +85,18 @@ class StageData:
 
 # Data collected from this sheet, big shoutout to Friday and their friend for gathering the logic: 
 # https://docs.google.com/spreadsheets/d/1xcdeANx_rk76uNjpTzSDubAzXn7za5Z9SlGcoUx4BC0/edit?usp=sharing
+
+"""
+NOTICE: W1-W10 had all of its data for everything except green and red goals imported by the ai from the google sheet.
+Everything after that utilizes AI made data structures (see the main comment above) but was hand written by me painstakingly.
+It took me multiple hours lol
+
+The patterns for IDs were an idea from me specifically that I use in most of my worlds. I highly recommend keeping this in place.
+The challenge stage ones could change, but I felt like it would be easier to make the 10000 area locations into challenges stages
+within a specific range. This was a human idea of mine, but it could honestly be changed.
+
+All logic was obviously done by Friday. That can stay.
+"""
 
 STAGE_GROUPS: dict[str, list[StageData]] = {
     # World 1 - Jungle Island
@@ -1034,11 +1054,11 @@ STAGE_GROUPS: dict[str, list[StageData]] = {
     ],
 }
 
-
+# NOTICE: From APQuest's template, keep this
 class BananaManiaLocation(Location):
     game = "Super Monkey Ball Banana Mania"
 
-
+# NOTICE: AI function, see below for more explanation
 def labeled_stages(group: str) -> list[tuple[str, StageData]]:
     """Label stages with their group/stage number"""
     labeled = []
@@ -1053,7 +1073,8 @@ def labeled_stages(group: str) -> list[tuple[str, StageData]]:
             labeled.append((f"[{group}-{number}]", stage))
     return labeled
 
-
+# NOTICE: I hand edited this one a lot, which you may notice makes it a little bit sloppier. I think the basic ideas here are good
+# but there is probably a better way to do this, and this basic function started as an AI function.
 def location_name(label: str, stage: StageData, kind: MissionKind, mission: Mission) -> str:
     """Build the display name for stages/categories"""
     # Categories only show their group label, not the stage name
@@ -1085,6 +1106,8 @@ LOCATION_NAME_TO_DATA: dict[str, LocationData] = {
     for kind, mission in stage.all_missions()
 }
 
+# NOTICE: these 3 came from the apquest template, and are really useful to have. I would just rewrite these
+# to whatever new data structure we come up with.
 LOCATION_NAME_TO_ID: dict[str, int] = {
     location_name(label, stage, kind, mission): stage.base_id + kind.offset
     for group in STAGE_GROUPS
@@ -1113,6 +1136,9 @@ def _include_mission(kind: MissionKind, world: BananaManiaWorld) -> bool:
         return bool(world.options.nonstop_missions)
     return True
 
+# NOTICE: These 2 were actually mostly written by me but edited by AI to fix issues.
+# They're pretty straight forward so I think they should stay, unless you have ideas to make them better.
+# You'll need to adjust stage_locations to handle whatever the new data structure is.
 def create_mission_locations(world: BananaManiaWorld, region, stage_label):
         region = world.get_region(region)
         stage_locations = get_location_names_with_ids([
@@ -1164,10 +1190,7 @@ def create_regular_locations(world: BananaManiaWorld) -> None:
     if world.options.original_stages_mode:
         create_mission_locations(world, "Original Stages Mode", "SP Original")
 
-def create_location_groups(world: BananaManiaWorld) -> None:
-    world.location
-
-
+# NOTICE: This is from the APQuest template, and should just stay. Using an event item for victory is very standard.
 def create_events(world: BananaManiaWorld) -> None:
     menu = world.get_region("Menu")
     menu.add_event(

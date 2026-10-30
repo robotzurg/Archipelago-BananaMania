@@ -2,6 +2,8 @@ from dataclasses import dataclass
 
 from Options import Choice, OptionGroup, PerGameCommonOptions, Range, Toggle, DefaultOnToggle
 
+# NOTICE: Everything in here is human made. It's just an options file lol
+
 class GoalWorlds(Range):
     """
     How many SMB2 adventure worlds you are expected to fully complete in order to goal.

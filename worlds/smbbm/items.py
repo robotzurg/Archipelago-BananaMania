@@ -135,6 +135,11 @@ INDIVIDUAL_WORLD_UNLOCKS = [
 def create_all_items(world: BananaManiaWorld) -> None:
     itempool: list[Item] = []
 
+    # [NOTICE] getattr was an ai suggestion, but there might be better ways to handle it.
+    # The individual world unlocks were also an ai suggestion
+    # The rest of this is either hand written, or touched by an ai like once or twice for minor fixes. Feel free
+    # to rewrite as you see fit, but this file is mostly fine minus the below section being slightly ai suggested.
+
     # SMB 2 worlds
     if world.options.world_structure == 0:  # progression
         itempool += [world.create_item("Progressive World Unlock") for _ in range(9)]

@@ -41,7 +41,8 @@ def create_and_connect_regions(world: BananaManiaWorld) -> None:
     create_all_regions(world)
     connect_regions(world)
 
-
+# NOTICE: Almost everything in here is just from the APQuest template, though I think
+# this function was edited to be a little more efficient with AI? I can't remember. It's pretty straightforward.
 def create_all_regions(world: BananaManiaWorld) -> None:
     menu = Region("Menu", world.player, world.multiworld)
     regions = [Region(name, world.player, world.multiworld) for name in WORLD_REGIONS]
