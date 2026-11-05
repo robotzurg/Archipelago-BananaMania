@@ -1,0 +1,410 @@
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,Red Goal,Banana Collecting,Time Limit,Nonstop,Standard Time,Intermediate Time,Expert Time,Level Name
+Simple,<10 seconds,<10 seconds,,None,None,None,,,10 - None,<10 seconds,,<10 seconds,<10 seconds,,Simple
+Hollow,18 seconds,<10 seconds,,Progressive Time Increase x1,None,None,,,20 - Progressive Time Increase x2,<10 seconds,,18 seconds,<10 seconds,,Hollow
+Bumpy,<10 seconds,<10 seconds,,None,None,None,,,30 - Progressive Time Increase x3,<10 seconds,,<10 seconds,<10 seconds,,Bumpy
+Switches,<10 seconds,,,Normal Switches,Normal Switches,Normal Switches,"Normal Switches, Progressive Time Increase x1",,25 - Progressive Time Increase x1 + Normal Switches,<10 seconds,,<10 seconds,,,Switches
+Conveyors,<10 seconds,<10 seconds,,None,None,None,,,30 - Progressive Time Increase x1,<10 seconds,✔,<10 seconds,<10 seconds,,Conveyors
+Floaters,<10 seconds,<10 seconds,,None,None,None,,,50 - Progressive Time Increase x3,<10 seconds,,<10 seconds,<10 seconds,,Floaters
+Tub,15 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,77 - Progressive Time Increase x2,<10 seconds,,15 seconds,<10 seconds,,Tub
+Windy Slide,32 seconds,<30 seconds,<20 seconds,Progressive Time Increase x3,Progressive Time Increase x2,Progressive Time Increase x1,,,70 - Progressive Time Increase x3,<30 seconds,✔,32 seconds,<30 seconds,<20 seconds,Windy Slide
+Spinning Top,14 seconds,11 seconds,<10 seconds,Progressive Time Increase x1,Progressive Time Increase x1,None,,,20 - Progressive Time Increase x2,<15 seconds,,14 seconds,11 seconds,<10 seconds,Spinning Top
+Curve Bridge,34 seconds,31 seconds,,Progressive Time Increase x3,,,,,60 - Progressive Time Increase x3,<35 seconds,,34 seconds,31 seconds,,Curve Bridge
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,Red Goal,Banana Collecting,Time Limit,Nonstop,Standard Time,Intermediate Time,Expert Time,Level Name
+Banks,15 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,25 - Progressive Time Increase x2,<10 seconds,,15 seconds,<10 seconds,,Banks
+Eaten Floor,15 seconds,11 seconds,<10 seconds,Progressive Time Increase x1,Progressive Time Increase x1,None,,,20 - Progressive Time Increase x5,<15 seconds,,15 seconds,11 seconds,<10 seconds,Eaten Floor
+Hoppers,<10 seconds,,,None,,,,,Complete - Progressive Time Increase x1,<5 seconds,,<10 seconds,,,Hoppers
+Coaster,23 seconds,22 seconds,17 seconds,Progressive Time Increase x2,Progressive Time Increase x2,Progressive Time Increase x1,,,55 - Progressive Time Increase x2,<30 seconds,,23 seconds,22 seconds,17 seconds,Coaster
+Bumpy Check,13 seconds,12 seconds,<10 seconds,Progressive Time Increase x1,Progressive Time Increase x1,None,,,25 - Progressive Time Increase x3,<15 seconds,,13 seconds,12 seconds,<10 seconds,Bumpy Check
+Swell,<10 seconds,,,None,,,,,25 - Progressive Time Increase x1,<10 seconds,,<10 seconds,,,Swell
+Gravity Slider,19 seconds,,,Progressive Time Increase x1,,,,,70 - Progressive Time Increase x2,<20 seconds,,19 seconds,,,Gravity Slider
+Inchworms,12 seconds,12 seconds,<10 seconds,Progressive Time Increase x1 ,Progressive Time Increase x1,None,Progressive Time Increase x1 + Normal Switches,Progressive Time Increase x1 + Normal Switches,30 - Progressive Time Increase x3,<15 seconds,,12 seconds,12 seconds,<10 seconds,Inchworms
+Totalitarianism,12 seconds,12 seconds,<10 seconds,Progressive Time Increase x1,Progressive Time Increase x1,None,,,15 - Progressive Time Increase x2,<15 seconds,✔,12 seconds,12 seconds,<10 seconds,Totalitarianism
+Alternative,>20 seconds,14 seconds,,Progressive Time Increase x2,Progressive Time Increase x1 + Fast Switches,,,,15 - Progressive Time Increase x2,<15 seconds,,>20 seconds,14 seconds,,Alternative
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,Red Goal,Banana Collecting,Time Limit,Nonstop,Standard Time,Intermediate Time,Expert Time,Level Name
+Organic Form,17 seconds,,,Progressive Time Increase x1,,,,,Complete - Progressive Time Increase x5,<20 seconds,,17 seconds,,,Organic Form
+Reversible Gear,13 seconds,,,Progressive Time Increase x1,,,,,30 - Progressive Time Increase x2,<15 seconds,,13 seconds,,,Reversible Gear
+Stepping Stones,19 seconds,,,Progressive Time Increase x1,,,,,70 - Progressive Time Increase x2,<20 seconds,,19 seconds,,,Stepping Stones
+Dribbles,48 seconds,34 seconds,,Progressive Time Increase x4,Progressive Time Increase x3,,,,Complete - Progressive Time Increase x5,<40 seconds,✔,48 seconds,34 seconds,,Dribbles
+Push Bar,13 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,Complete - Progressive Time Increase x4,<15 seconds,,13 seconds,<10 seconds,,Push Bar
+Mad Rings,<10 seconds,,,None,,,None,Progressive Time Increase x1,30 - Progressive Time Increase x2,<5 seconds,,<10 seconds,,,Mad Rings
+Curvy Options,13 seconds,,,Progressive Time Increase x1,,,,,40 - Progressive Time Increase x2,<15 seconds,,13 seconds,,,Curvy Options
+Twist & Spin,11 seconds,11 seconds,<10 seconds,Progressive Time Increase x1,Progressive Time Increase x1,None,,,15 - Progressive Time Increase x2,<15 seconds,,11 seconds,11 seconds,<10 seconds,Twist & Spin
+Cascade,29 seconds,14 seconds,<10 seconds,Progressive Time Increase x2,Progressive Time Increase x1,None,,,25 - Progressive Time Increase x3,<30 seconds,,29 seconds,14 seconds,<10 seconds,Cascade
+Junction,13 seconds,,<10 seconds,Progressive Time Increase x1,,None,Progressive Time Increase x1,,38 - Progressive Time Increase x2,<15 seconds,,13 seconds,,<10 seconds,Junction
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,Red Goal,Banana Collecting,Time Limit,Nonstop,Standard Time,Intermediate Time,Expert Time,Level Name
+Pro Skaters,<10 seconds,,,Pause Switches,None,,None,,20 - Progressive Time Increase x2 + Pause Switches,<10 seconds,,<10 seconds,,,Pro Skaters
+Giant Comb,28 seconds,12 seconds,<10 seconds,Progressive Time Increase x2,Progressive Time Increase x1,None,,,15 - Progressive Time Increase x2,<15 seconds,✔,28 seconds,12 seconds,<10 seconds,Giant Comb
+Beehive,27 seconds,13 seconds,,Progressive Time Increase x2,,,,,25 - Progressive Time Increase x5,<15 seconds,,27 seconds,13 seconds,,Beehive
+Dynamic Maze,19 seconds,,<10 seconds,Progressive Time Increase x1,,,,,30 - Progressive Time Increase x4,<20 seconds,,19 seconds,,<10 seconds,Dynamic Maze
+Triangle Holes,<10 seconds,,,None,,,,,30 - Progressive Time Increase x2,<10 seconds,✔,<10 seconds,,,Triangle Holes
+Launchers,28 seconds,18 seconds,,Progressive Time Increase x2,,,Progressive Time Increase x1,,10 - Progressive Time Increase x4,<20 seconds,,28 seconds,18 seconds,,Launchers
+Randomizer,14 seconds,11 seconds,<10 seconds,Progressive Time Increase x1,Progressive Time Increase x1,None,Progressive Time Increase x1,Progressive Time Increase x1,35 - Progressive Time Increase x1,<15 seconds,,14 seconds,11 seconds,<10 seconds,Randomizer
+Coin Slots,26 seconds,11 seconds,,Progressive Time Increase x2,,,Progressive Time Increase x1,,Complete - Progressive Time Increase x2,<30 seconds,,26 seconds,11 seconds,,Coin Slots
+Seesaw Bridges,48 seconds,38 seconds,29 seconds,Progressive Time Increase x4,Progressive Time Increase x3,Progressive Time Increase x2,,,40 - Progressive Time Increase x4,<55 seconds,,48 seconds,38 seconds,29 seconds,Seesaw Bridges
+Arthropod,12 seconds,,,Progressive Time Increase x1,,,,,Complete - Progressive Time Increase x4,<30 seconds,,12 seconds,,,Arthropod
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,Red Goal,Banana Collecting,Time Limit,Nonstop,Standard Time,Intermediate Time,Expert Time,Level Name
+Wormhole,22 seconds,19 seconds,,Progressive Time Increase x2 + Wormholes,Progressive Time Increase x1 + Wormholes,,,,50 - Progressive Time Increase x3 + Wormholes,<25 seconds,✔,22 seconds,19 seconds,,Wormhole
+Free Fall,18 seconds,,<10 seconds,Progressive Time Increase x1,,,Progressive Time Increase x2,,50 - Progressive Time Increase x4,<20 seconds,,18 seconds,,<10 seconds,Free Fall
+Melting Pot,<10 seconds,,,None,,,,,10 - None,<15 seconds,,<10 seconds,,,Melting Pot
+Mad Shuffle,<10 seconds,,,Wormholes,,,,,Complete - Progressive Time Increase x4 + Normal Switches +Wormholes,<10 seconds,,<10 seconds,,,Mad Shuffle
+Bead Screen,14 seconds,<10 seconds,,Progressive Time Increase x1 + Pause Switches,None,,,,20 - Progressive Time Increase x1 + Pause Switches,<15 seconds,,14 seconds,<10 seconds,,Bead Screen
+Jump Machine,12 seconds,,,Progressive Time Increase x1,,,Progressive Time Increase x2,Progressive Time Increase x3,25 - Progressive Time Increase x3,<15 seconds,,12 seconds,,,Jump Machine
+Zigzag Slope,17 seconds,,,Progressive Time Increase x1,,,,,25 - Progressive Time Increase x2,<20 seconds,,17 seconds,,,Zigzag Slope
+Tower,12 seconds,,,Progressive Time Increase x1 + Wormholes,,,,,25 - Progressive Time Increase x1 + Wormholes,<15 seconds,,12 seconds,,,Tower
+Toggle,<10 seconds,,,None,,,,,Complete - Progressive Time Increase x2,<10 seconds,,<10 seconds,,,Toggle
+Fluctuation,15 seconds,<10 seconds,,Progressive Time Increase x1,,,,,20 - Progressive Time Increase x3,<20 seconds,,15 seconds,<10 seconds,,Fluctuation
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,Red Goal,Banana Collecting,Time Limit,Nonstop,Standard Time,Intermediate Time,Expert Time,Level Name
+Combination,25 seconds,<10 seconds,,Progressive Time Increase x2 + Wormholes + Normal Switches,Wormholes,,,,25 - Progressive Time Increase x4 + Wormholes + Normal Switches,<10 seconds,,25 seconds,<10 seconds,,Combination
+Punched Seesaws,<10 seconds,,,None,,,Progressive Time Increase x2,,21 - Progressive Time Increase x2,<10 seconds,,<10 seconds,,,Punched Seesaws
+Opera,45 seconds,34 seconds,29 seconds,Progressive Time Increase x4,Progressive Time Increase x3,Progressive Time Increase x2,,,70 - Progressive Time Increase x5,<35 seconds,,45 seconds,34 seconds,29 seconds,Opera
+Brandished,<10 seconds,,,None,,,,,35 - Progressive Time Increase x2?,<5 seconds,,<10 seconds,,,Brandished
+Tiers,16 seconds,,,Progressive Time Increase x1 + Wormholes,,,Progressive Time Increase x2 + Wormholes,Progressive Time Increase x1 + Wormholes,20 - Progressive Time Increase x3 + Wormholes,<30 seconds,,16 seconds,,,Tiers
+Cliffs,29 seconds,19 seconds,<10 seconds,Progressive Time Increase x2,Progressive Time Increase x1,,,,20 - Progressive Time Increase x2,<30 seconds,,29 seconds,19 seconds,<10 seconds,Cliffs
+Narrow Peaks,17 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,15 - Progressive Time Increase x2,<20 seconds,,17 seconds,<10 seconds,,Narrow Peaks
+Detours,11 seconds,<10 seconds,,Progressive Time Increase x1 + Wormholes,Wormholes,None,Progressive Time Increase x1 + Wormholes,,20 - Progressive Time Increase x1 + Wormholes,<15 seconds,,11 seconds,<10 seconds,,Detours
+Switch Inferno,<10 seconds,,,Normal Switches,,,,,9 - Play Switch,<15 seconds,,<10 seconds,,,Switch Inferno
+Folders,13 seconds,,,Progressive Time Increase x1,,,,,10 - Progressive Time Increase x1,<20 seconds,,13 seconds,,,Folders
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,Red Goal,Banana Collecting,Time Limit,Nonstop,Standard Time,Intermediate Time,Expert Time,Level Name
+Spiral Bridge,19 seconds,,,Progressive Time Increase x1,,,,,20 - Progressive Time Increase x1,<20 seconds,,19 seconds,,,Spiral Bridge
+Wavy Option,<10 seconds,,,None,,,,,20 - Progressive Time Increase x1,<10 seconds,✔,<10 seconds,,,Wavy Option
+Obstacle,19 seconds,,,Progressive Time Increase x1,,,,,20 - Progressive Time Increase x2,<20 seconds,,19 seconds,,,Obstacle
+Domino,11 seconds,<10 seconds,,Progressive Time Increase x1 + Normal Switches,Normal Switches,None,,,25 - Progressive Time Increase x2 + Normal Switches,<15 seconds,,11 seconds,<10 seconds,,Domino
+Sieve,28 seconds,,,Progressive Time Increase x2,,,,,15 - Progressive Time Increase x2,<30 seconds,✔,28 seconds,,,Sieve
+Flock,49 seconds,19 seconds,<10 seconds,Progressive Time Increase x4,Progressive Time Increase x1,None,,,15 - Progressive Time Increase x5,<50 seconds,,49 seconds,19 seconds,<10 seconds,Flock
+Double Spiral,19 seconds,,,Progressive Time Increase x1,,,,,10 - Progressive Time Increase x2,<25 seconds,,19 seconds,,,Double Spiral
+Hierarchy,24 seconds,<10 seconds,,Progressive Time Increase x2,,,,,15 - Progressive Time Increase x2,<25 seconds,,24 seconds,<10 seconds,,Hierarchy
+8 Bracelets,21 seconds,,,Progressive Time Increase x2,,,Progressive Time Increase x2,Progressive Time Increase x2,10 - Progressive Time Increase x2,<25 seconds,,21 seconds,,,8 Bracelets
+Quick Turn,<10 seconds,,,Fast Forward Switch?,,,,,Complete - Fast Forward Switch OR Progressive Time Increase x1,<10 seconds,✔,<10 seconds,,,Quick Turn
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,Red Goal,Banana Collecting,Time Limit,Nonstop,Standard Time,Intermediate Time,Expert Time,Level Name
+Pistons,27 seconds,16 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,20 - Progressive Time Increase x2,<20 seconds,,27 seconds,16 seconds,,Pistons
+Soft Cream,17 seconds,13 seconds,<10 seconds,Progressive Time Increase x1 + Normal Switches,Progressive Time Increase x1 + Normal Switches OR  Fast Switches,Normal Switches OR Fast Switches OR (Pause Switches + Progressive Time Increase x1),,,16 - Progressive Time Increase x1 + Normal Switches,<20 seconds,,17 seconds,13 seconds,<10 seconds,Soft Cream
+Momentum,<10 seconds,,,None,,,,,21 - Progressive Time Increase x1,<10 seconds,,<10 seconds,,,Momentum
+Entangled Path,41 seconds,31 seconds,<30 seconds,Progressive Time Increase x4 + Fast Switches  + Normal Switches OR Progressive Time Increase x5,Progressive Time Increase x3 + Fast Switches + Normal Switches,Progressive Time Increase x2,Progressive Time Increase x3 + Normal Switches + Fast Switches,,30 - Progressive Time Increase x4 + Normal Switches + Fast Switches,<40 seconds,,41 seconds,31 seconds,<30 seconds,Entangled Path
+Totters,<10 seconds,,,None,,,,,28 - None,<10 seconds,,<10 seconds,,,Totters
+Vortex,27 seconds,18 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,Progressive Time Increase x2,,10 - Progressive Time Increase x3,<30 seconds,,27 seconds,18 seconds,,Vortex
+Warp,27 seconds,,,Progressive Time Increase x2,,,Progressive Time Increase x3,,10 - Progressive Time Increase x4,<40 seconds,,27 seconds,,,Warp
+Trampolines,29 seconds,16 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,40 - Progressive Time Increase x2,<30 seconds,,29 seconds,16 seconds,,Trampolines
+Swing Shaft,26 seconds,14 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,10 - Progressive Time Increase x2,<30 seconds,,26 seconds,14 seconds,,Swing Shaft
+Linear Seesaws,<10 seconds,,,None,,,,,10 - Progressive Time Increase x1,<10 seconds,✔,<10 seconds,,,Linear Seesaws
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,Red Goal,Banana Collecting,Time Limit,Nonstop,Standard Time,Intermediate Time,Expert Time,Level Name
+Serial Jump,<10 seconds,,,None,,,Progressive Time Increase x1,None,10 - Progressive Time Increase x1,<15 seconds,,<10 seconds,,,Serial Jump
+Cross Floors,14 seconds,,,Progressive Time Increase x1,,,,,20 - Progressive Time Increase x1,<15 seconds,,14 seconds,,,Cross Floors
+Spinning Saw,25 seconds,<10 seconds,,Progressive Time Increase x2,None,,,,20 - Progressive Time Increase x2,<15 seconds,,25 seconds,<10 seconds,,Spinning Saw
+Chipped Pipes,15 seconds,<10 seconds,,Progressive Time Increase x1,None,,Progressive Time Increase x1,,20 - Progressive Time Increase x1,<15 seconds,,15 seconds,<10 seconds,,Chipped Pipes
+Flat Maze,56 seconds,39 seconds,22 seconds,Progressive Time Increase x5,Progressive Time Increase x3,Progressive Time Increase x2,,,20 - Progressive Time Increase x5,<40 seconds,,56 seconds,39 seconds,22 seconds,Flat Maze
+Guillotine,25 seconds,,19 seconds,Progressive Time Increase x2,,Progressive Time Increase x1,,,10 - Progressive Time Increase x2,<30 seconds,,25 seconds,,19 seconds,Guillotine
+Cork Screw,18 seconds,,,Progressive Time Increase x1,,,,,12 - Progressive Time Increase x1,<20 seconds,,18 seconds,,,Cork Screw
+Orbiters,<10 seconds,,,None,,,,,15 - Progressive Time Increase x1,<10 seconds,,<10 seconds,,,Orbiters
+Twin Basin,15 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,14 - Progressive Time Increase x2,<15 seconds,,15 seconds,<10 seconds,,Twin Basin
+Air Hockey,19 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,40 - Progressive Time Increase x3,<20 seconds,,19 seconds,<10 seconds,,Air Hockey
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,Red Goal,Banana Collecting,Time Limit,Nonstop,Standard Time,Intermediate Time,Expert Time,Level Name
+Training,<10 seconds,,,None,,,,,40 - Progressive Time Increase x3,<10 seconds,,<10 seconds,,,Training
+Gimmick,54 seconds,48 seconds,,Progressive Time Increase x5 + Normal Switches,Progressive Time Increase x4 + Normal Switches,,,,25 - Progressive Time Increase x5 + Normal Switches,<55 seconds,,54 seconds,48 seconds,,Gimmick
+Mountain,<10 seconds,,,None,,,,,10 - None,<10 seconds,,<10 seconds,,,Mountain
+Disorder,25 seconds,12 seconds,<10 seconds,Progressive Time Increase x2,Progressive Time Increase x1,None,,,25 - Progressive Time Increase x2,<15 seconds,,25 seconds,12 seconds,<10 seconds,Disorder
+3D Maze,22 seconds,19 seconds,,Progressive Time Increase x2 ,Progressive Time Increase x1,,,,20 - Progressive Time Increase x2,<30 seconds,,22 seconds,19 seconds,,3D Maze
+Crazy Maze,55 seconds,48 seconds,,Progressive Time Increase x5,Progressive Time Increase x4,,,,20 - Progressive Time Increase x5,<59 seconds,,55 seconds,48 seconds,,Crazy Maze
+Post Modern,46 seconds,38 seconds,,Progressive Time Increase x4,Progressive Time Increase x3,,,,10 - Progressive Time Increase x4,<45 seconds,,46 seconds,38 seconds,,Post Modern
+Revolution,19 seconds,,,Progressive Time Increase x1,,,,,10 - Progressive Time Increase x3,<20 seconds,,19 seconds,,,Revolution
+Invisible,55 seconds,47 seconds,,Progressive Time Increase x5 + Normal Switches,Progressive Time Increase x4 + Normal Switches,,,,29 - Progressive Time Increase x5 + Normal Switches,<50 seconds,,55 seconds,47 seconds,,Invisible
+Last Stage,25 seconds,,,Progressive Time Increase x2 + Normal Switches,,,,,25 - Progressive Time Increase x2 + Normal Switches,<25 seconds,,25 seconds,,,Last Stage
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,Red Goal,,,,,,,
+Edge,<10 seconds,,,None,,,,,,,,,,,
+Escalators,>20 seconds,18 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,,
+Serpentine,11 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Swirl,35 seconds,,,Progressive Time Increase x3,,,,,,,,,,,
+Dormant Pits,<10 seconds,,,None,,,,,,,,,,,
+Composition,25 seconds,<20 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,,
+Dynamo,25 seconds,12 seconds,<10 seconds,Progressive Time Increase x2,Progressive Time Increase x1,None,,,,,,,,,
+Lunchbox,12 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Gutter,29 seconds,19 seconds,<10 seconds,Progressive Time Increase x2,Progressive Time Increase x1,None,,,,,,,,,
+Scabrous,<10 seconds,,,None,,,,,,,,,,,
+Jolt Channel,26 seconds,<20 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,,
+Inertial,<10 seconds,,,None,,,,,,,,,,,
+Octagonal,18 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Sewer,19 seconds,,<10 seconds,Progressive Time Increase x1,Progressive Time Increase x1,None,,,,,,,,,
+Arc Bridges,27 seconds,19 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,,
+Veer Field,45 seconds,28 seconds,<20 seconds,Progressive Time Increase x4,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,
+Teeter,26 seconds,19 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,,
+Stream,15 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Catwalk,38 seconds,<10 seconds,,Progressive Time Increase x3,None,,,,,,,,,,
+Catapult,12 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Rhombus,<10 seconds,,,None,,,,,,,,,,,
+Buoy,<10 seconds,,,None,,,,,,,,,,,
+Coil Ramp,48 seconds,16 seconds,<10 seconds,Progressive Time Increase x4,Progressive Time Increase x1,,,,,,,,,,
+Millefeuille,11 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Waver,38 seconds,31 seconds,29 seconds,Progressive Time Increase x3,Progressive Time Increase x2,,"green goal past blue, may need more progrssive time",,,,,,,,
+Fat Seesaw,<10 seconds,,,None,,,,,,,,,,,
+Treads,43 seconds,26 seconds,15 seconds,Progressive Time Increase x4,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,
+Jump Ramp,11 seconds,,<10 seconds,Progressive Time Increase x1,Progressive Time Increase x1,None,,,,,,,,,
+Hounds Tooth,<10 seconds,,,None,,,,,,,,,,,
+D.N.A.,19 seconds,<10 seconds,,Progressive Time Increase x1,None,,Green goal is easier to sub 10 seconds then blue,,,,,,,,
+Building,28 seconds,,,Progressive Time Increase x2,,,,,,,,,,,
+Scrolls,21 seconds,19 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,,
+Cliff,58 seconds,48 seconds,<10 seconds,Progressive Time Increase x5,Progressive Time Increase x4,None,,,,,,,,,
+Concentric,18 seconds,,<10 seconds,Progressive Time Increase x1,Progressive Time Increase x1,None,,,,,,,,,
+Stadium,15 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Dungeon,45 seconds,29 seconds,21 seconds,Progressive Time Increase x4,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,
+Paraboloid,,,,,,,,,,,,,,,
+Spatiotemporal,<10 seconds,,,Wormholes,,,,,,,,,,,
+Chaos,57 seconds,,,Progressive Time Increase x5,,,,,,,,,,,
+Tilt Maze,55 seconds,<10 seconds,,Progressive Time Increase x5,None,,,,,,,,,,
+Fractal,18 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Hills,12 seconds,<10 seconds,,Progressive Time Increase x1,None,,Progressive Time Increase x1,,,,,,,,
+Dodge Maze,55 seconds,47 seconds,,Progressive Time Increase x5,Progressive Time Increase x4,,,,,,,,,,
+Shelter,18 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Mobius,25 seconds,<10 seconds,,Progressive Time Increase x2 + Fast Switches,None,,,,,,,,,,
+Asterisk,<10 seconds,,,None,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Difficulty,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,,,,,,,,,
+Casual (Exam A),<30 seconds,<20 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,,
+Normal (Puzzle),39 seconds,<30 seconds,,Progressive Time Increase x3,Progressive Time Increase x2,,,,,,,,,,
+Expert (Wind or Exam C),55 seconds,45 seconds,35 seconds,Progressive Time Increase x5,Progressive Time Increase x4,Progressive Time Increase x3,,,,,,,,,
+Master (Spring Master),45 seconds,,,Progressive Time Increase x4,,,,,,,,,,,
+Marathon,,,,Progressive Time Increase x5,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,,,,,,,,,
+Branch,,,,Progressive Time Increase x1,,,,,,,,,,,
+Waver,,,,Progressive Time Increase x4,,,,,,,,,,,
+Free Throw,,,,Progressive Time Increase x3,,,,,,,,,,,
+Rings,,,,Progressive Time Increase x1,,,,,,,,,,,
+Amida Lot,,,,Progressive Time Increase x1,,,,,,,,,,,
+Carpet,,,,Progressive Time Increase x3,,,,,,,,,,,
+Clover,,,,Progressive Time Increase x2,,,,,,,,,,,
+Punched Seesaw,,,,Progressive Time Increase x2,,,,,,,,,,,
+Checker,,,,Progressive Time Increase x5,,,,,,,,,,,
+Polar Large,,,,None,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,,,,,,,,,
+Cross Floors,,,,Progressive Time Increase x1,,,,,,,,,,,
+Ant Lion,,,,None,,,,,,,,,,,
+Earthquake,,,,Progressive Time Increase x1,,,,,,,,,,,
+Destruction,,,,Progressive Time Increase x5,,,,,,,,,,,
+Narrow Peaks,,,,Progressive Time Increase x3,,,,,,,,,,,
+Centrifugal,,,,Progressive Time Increase x2,,,,,,,,,,,
+Breathe,,,,Progressive Time Increase x1,,,,,,,,,,,
+Twin Basin,,,,Progressive Time Increase x1,,,,,,,,,,,
+Swing Bar Long,,,,Progressive Time Increase x1,,,,,,,,,,,
+Sega Logo,,,,Progressive Time Increase x5,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,,,,,,,,,
+Blur Bridge,,,,Progressive Time Increase x3,,,,,,,,,,,
+Dungeon,,,,Progressive Time Increase x5,,,,,,,,,,,
+Mad Rings,,,,Progressive Time Increase x3,,,,,,,,,,,
+Dodge Maze,,,,Progressive Time Increase x5,,,,,,,,,,,
+Paper Work,,,,Progressive Time Increase x5,,,,,,,,,,,
+Chaos,,,,Progressive Time Increase x5,,,,,,,,,,,
+Training,,,,Progressive Time Increase x5,,,,,,,,,,,
+Flat Maze,,,,Progressive Time Increase x5,,,,,,,,,,,
+Strata,,,,Progressive Time Increase x5,,,,,,,,,,,
+Crazy Mazze,,,,Progressive Time Increase x5,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,,,,,,,,,
+Catwalk,,,,Progressive Time Increase x4,,,,,,,,,,,
+Polar,,,,None,,,,,,,,,,,
+Launchers,,,,Progressive Time Increase x1,,,,,,,,,,,
+Arthropod,,,,Progressive Time Increase x1,,,,,,,,,,,
+Polar Large,,,,Progressive Time Increase x4,,,,,,,,,,,
+Chaos,,,,Progressive Time Increase x5,,,,,,,,,,,
+Exam-C,,,,Progressive Time Increase x4,,,,,,,,,,,
+Tracks,,,,Progressive Time Increase x4,,,,,,,,,,,
+Twin Attacker,,,,None,,,,,,,,,,,
+8 Bracelets,,,,Progressive Time Increase x2,,,,,,,,,,,
+Curvature,,,,Progressive Time Increase x4,,,,,,,,,,,
+Soft Cream,,,,Progressive Time Increase x1 + Fast Forward Switch,,,,,,,,,,,
+Air Hockey,,,,None,,,,,,,,,,,
+Cylinders,,,,Progressive Time Increase x1,,,,,,,,,,,
+Notch,,,,Progressive Time Increase x1,,,,,,,,,,,
+Long Torus,,,,Progressive Time Increase x2,,,,,,,,,,,
+Clock Face,,,,Progressive Time Increase x2,,,,,,,,,,,
+Wave Master,,,,Progressive Time Increase x2,,,,,,,,,,,
+Stamina Master,,,,Progressive Time Increase x1,,,,,,,,,,,
+Dance Master,,,,None,,,,,,,,,,,
+Dodge Master,,,,None,,,,,,,,,,,
+Bridge Master,,,,Progressive Time Increase x1,,,,,,,,,,,
+Synchronized,,,,None,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,,,,,,,,
+Plain,<10 seconds,,,None,,,,,,,,,,,
+Diamond,<10 seconds,,,None,,,None,,,,,,,,
+Hairpin,<10 seconds,,,None,,,,,,,,,,,
+Wide Bridge,<10 seconds,,,None,,,,,,,,,,,
+Bonus Basic (Casual),<10 seconds,,,None,,,,,,,,,,,
+Slopes,<10 seconds,,,None,,,,,,,,,,,
+Steps,12 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Blocks,14 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Jump Single,<10 seconds,,,None,,,,,,,,,,,
+Exam-A,14 seconds,,<10 seconds,Progressive Time Increase x1,,None,,,,,,,,,
+Blur Bridge (Casual),<10 seconds,,,None,,,,,,,,,,,
+Hitter,<10 seconds,,,None,,,,,,,,,,,
+Banana Plate (Casual),<10 seconds,,,None,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,Column 1,,,,,,,
+Bump,<10 seconds,,,None,,,,,,,,,,,
+Walking,10.5 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Repulse,<10 seconds,,,None,,,,,,,,,,,
+Narrow Bridge,15 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Bonus Basic (Normal),<10 seconds,,,None,,,,,,,,,,,
+Break,<10 seconds,,,None,,,None,,,,,,,,
+Curves,11 seconds,,<10 seconds,Progressive Time Increase x1,,None,,,,,,,,,
+Downhill,13 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Blocks Slim,15 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Bonus Wave (Normal),<10 seconds,,,None,,,,,,,,,,,
+Choice,13 seconds,,<10 seconds,Progressive Time Increase x1,,None,None,,,,,,,,
+Bowl,<10 seconds,,,None,,,,,,,,,,,
+Jumpies,<10 seconds,,,None,,,,,,,,,,,
+Stoppers,15 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Floor Bent,14 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Conveyer,<10 seconds,,,None,,,,,,,,,,,
+Exam-B,17 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Chaser,11 seconds,<10 seconds,,Progressive Time Increase x1,None,,Progressive Time Increase x2,Progressive Time Increase x2,,,,,,,
+Jump Double,<10 seconds,,,None,,,,,,,,,,,
+Bonus Grid (Normal),<10 seconds,,,None,,,,,,,,,,,
+Middle Jam,22 seconds,,,Progressive Time Increase x2,,,,,,,,,,,
+Ant Lion,<10 seconds,,,None,,,,,,,,,,,
+Collapse,17 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Swing Bar,<10 seconds,,,None,,,,,,,,,,,
+Labyrinth,24 seconds,<10 seconds,,Progressive Time Increase x2,None,,None,,,,,,,,
+Spiral,25 seconds,<10 seconds,,Progressive Time Increase x2,None,,,,,,,,,,
+Wavy Jump,<10 seconds,,,None,,,,,,,,,,,
+Spiky,13 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Unrest,<10 seconds,,,None,,,,,,,,,,,
+Polar,<10 seconds,,,None,,,,,,,,,,,
+Blur Bridge (Normal),<10 seconds,,,None,,,,,,,,,,,
+Hard Hitter (Normal),<10 seconds,,,None,,,,,,,,,,,
+Puzzle,31 seconds,18 seconds,<10 seconds,Progressive Time Increase x3,Progressive Time Increase x1,None,,,,,,,,,
+Banana Plate (Normal),<10 seconds,,,None,,,,,,,,,,,
+Polar Large,18 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,Green Goal,Red Goal,,,,,,,
+Ruin,<10 seconds,,,None,,,,,,,,,,,
+Branch,<10 seconds,,,None,,,,Progressive Time Increase x1,,,,,,,
+Overturn,<10 seconds,,,None,,,None,,,,,,,,
+Excursion,45 seconds,<10 seconds,,Progressive Time Increase x4,None,,,,,,,,,,
+Bonus Basic (Expert),<10 seconds,,,None,,,,,,,,,,,
+Dodecagon,21 seconds,,,Progressive Time Increase x2,,,,,,,,,,,
+Exam-C,55 seconds,45 seconds,35 seconds,Progressive Time Increase x5,Progressive Time Increase x4,Progressive Time Increase x3,,,,,,,,,
+Skeleton,11 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Tracks,22 seconds,18 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,,
+Bonus Wave (Expert),<10 seconds,,,None,,,,,,,,,,,
+Downhill Hard,21 seconds,16 seconds,,Progressive Time Increase x2,,,,,,,,,,,
+Gears,35 seconds,21 seconds,15 seconds,Progressive Time Increase x3,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,
+Destruction,28 seconds,<10 seconds,,Progressive Time Increase x2,None,,,,,,,,,,
+Invasion,35 seconds,27 seconds,17 seconds,Progressive Time Increase x3,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,
+Diving,<10 seconds,,,None,,,,,,,,,,,
+Floor Slant,<10 seconds,,,None,,,,,,,,,,,
+Tram,12 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Swing Bar Long,<10 seconds,,,None,,,,,,,,,,,
+Paper Work,12 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Bonus Grid (Expert),<10 seconds,,,None,,,,,,,,,,,
+Twin Attacker,<10 seconds,,,None,,,,,,,,,,,
+Sega Logo,22 seconds,12 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,,
+Snake,<10 seconds,,,None,,,,,,,,,,,
+Wind,45 seconds,35 seconds,,Progressive Time Increase x4,Progressive Time Increase x3,,,,,,,,,,
+Sliders,12 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Fall Down,<10 seconds,,,None,,,,,,,,,,,
+Twin Cross,22 seconds,<10 seconds,,Progressive Time Increase x2,None,,,,,,,,,,
+Spiral Hard,32 seconds,<10 seconds,,Progressive Time Increase x3,None,,,,,,,,,,
+Conveyor Parts,17 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Bonus Bumpy,<10 seconds,,,None,,,,,,,,,,,
+Gaps,<10 seconds,,,None,,,,,,,,,,,
+Curvature,45 seconds,35 seconds,26 seconds,Progressive Time Increase x4,Progressive Time Increase x3,Progressive Time Increase x2,,,,,,,,,
+Ant Lion Super,<10 seconds,,,None,,,,,,,,,,,
+Drum,<10 seconds,,,None,,,,,,,,,,,
+Twister,<10 seconds,,,None,,,,,,,,,,,
+Speedy Jam,15 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Quake,<10 seconds,,,None,,,,,,,,,,,
+Cassiopeia,15 seconds,<10 seconds,,Progressive Time Increase x1,None,None,,,,,,,,,
+Pirates,<10 seconds,,,None,,,,,,,,,,,
+Bonus Hunting,<10 seconds,,,None,,,,,,,,,,,
+Bowl Open,<10 seconds,,,None,,,,,,,,,,,
+Checker,<10 seconds,,,None,,,,,,,,,,,
+Carpet,25 seconds,16 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,,
+Ridge,17 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Mixer,15 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Rings,11 seconds,<10 seconds,,Progressive Time Increase x1,None,,Progressive Time Increase x1,,,,,,,,
+Stairs,<10 seconds,,,None,,,,,,,,,,,
+Clover,21 seconds,18 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,,
+Coffee Cup,<10 seconds,,,None,,,,,,,,,,,
+Metamorphosis,<10 seconds,,,None,,,,,,,,,,,
+Blur Bridge (Expert),<10 seconds,,,None,,,,,,,,,,,
+Breathe,<10 seconds,,,None,,,,,,,,,,,
+Hard Hitter (Expert),<10 seconds,,,None,,,,,,,,,,,
+Ferris Wheel,<10 seconds,,,None,,,,,,,,,,,
+Factory,11 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Curl Pipe,<10 seconds,,,None,,,,,,,,,,,
+Magic Hand,27 seconds,<10 seconds,,Progressive Time Increase x2,None,,,,,,,,,,
+Banana Plate (Expert),<10 seconds,,,None,,,,,,,,,,,
+Sanctuary,11 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Daa Loo Maa,13 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,,,,,,,,,
+Wave Master,26 seconds,,13 seconds,Progressive Time Increase x2,,Progressive Time Increase x1,,,,,,,,,
+Fan Master,21 seconds,19 seconds,<10 seconds,Progressive Time Increase x2,Progressive Time Increase x1,None,,,,,,,,,
+Stamina Master,35 seconds,14 seconds,,Progressive Time Increase x3,Progressive Time Increase x1,,,,,,,,,,
+Spring Master,45 seconds,,,Progressive Time Increase x4,,Progressive Time Increase x1,,,,,,,,,
+Dance Master,<10 seconds,,,None,,,,,,,,,,,
+Roll Master,25 seconds,<10 seconds,,Progressive Time Increase x2,None,,,,,,,,,,
+Edge Master,18 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Dodge Master,<10 seconds,,,None,,,,,,,,,,,
+Bridge Master,12 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Monkey Master,<10 seconds,,,None,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,,,,,,,,,
+Birth,28 seconds,,,Progressive Time Increase x2 + Pause Switch,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,,,,,,,,,
+Auto Doors,22 seconds,,,Progressive Time Increase x2,,,,,,,,,,,
+Heavy Sphere,9 seconds,,,Normal Switches,,,,,,,,,,,
+Stagger,22 seconds,,,Progressive Time Increase x2,,,,,,,,,,,
+U.F.O,17 seconds,,,Progressive Time Increase x1 + Normal Switches,,,,,,,,,,,
+Ring Bridges,22 seconds,19 seconds,,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,,
+Domes,17 seconds,<10 seconds,,Progressive Time Increase x1,None,,,,,,,,,,
+Amida Lot,<10 seconds,,,None,,,,,,,,,,,
+Long Slider,32 seconds,,<10 seconds,Progressive Time Increase x3,,None,,,,,,,,,
+Grid Bridge,15 seconds,,<10 seconds,Progressive Time Increase x1 + Normal Switches,Progressive Time Increase x1,None,,,,,,,,,
+Teapot,<10 seconds,,,Normal Switches,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,,,,,,,,,
+Charge,11 seconds,,,Progressive Time Increase x1 + Wormholes,,,,,,,,,,,
+Strata,27 seconds,,,Progressive Time Increase x2,,,,,,,,,,,
+Square Dance,<10 seconds,,,None,,,,,,,,,,,
+Giant Swing,39 seconds,,,Progressive Time Increase x3,,,,,,,,,,,
+5 Drums,18 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Free Throw,<10 seconds,,,None,,,,,,,,,,,
+Pendulums,36 seconds,,<10 seconds,Progressive Time Increase x3,,None,,,,,,,,,
+Conical Slider,35 seconds,,,Progressive Time Increase x3 + Wormholes,,,,,,,,,,,
+Construction,39 seconds,,,Progressive Time Increase x3,,,,,,,,,,,
+Train Worm,<30 seconds,<10 seconds,,Progressive Time Increase x2,None,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Level Name,Standard Time,Intermediate Time,Expert Time,Required Items Standard,Required Items Intermediate,Required Items Expert,,,,,,,,,
+Centrifugal,22 seconds,18 seconds,<10 seconds,Progressive Time Increase x2,Progressive Time Increase x1,,,,,,,,,,
+Swing Bridges,18 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Cylinders,<10 seconds,,,None,,,,,,,,,,,
+Passage,23 seconds,,,Progressive Time Increase x2,,,,,,,,,,,
+Notch,15 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Intermittent,<10 seconds,,,None,,,,,,,,,,,
+Long Torus,22 seconds,,,Progressive Time Increase x2,,,,,,,,,,,
+Spasmodic,<10 seconds,,,None,,,,,,,,,,,
+Double Twin,18 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Clock Face,23 seconds,,,Progressive Time Increase x2,,,,,,,,,,,
+Variable Width,<10 seconds,,,None,,,,,,,,,,,
+Striker,15 seconds,<10 seconds,,Progressive Time Increase x1,,,,,,,,,,,
+Ooparts,<10 seconds,,,None,,,,,,,,,,,
+Planets,18 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Sliced Cheese,23 seconds,,,Progressive Time Increase x2,,,,,,,,,,,
+8 Seesaws,12 seconds,,,Progressive Time Increase x1,,,,,,,,,,,
+Synchronized,<10 seconds,,,None,,,,,,,,,,,
+Helix,53 seconds,,,Progressive Time Increase x5,,,,,,,,,,,
+Dizzy System,<10 seconds,,,None,,,,,,,,,,,
+Destiny,31 seconds,,,Progressive Time Increase x3,,,,,,,,,,,
