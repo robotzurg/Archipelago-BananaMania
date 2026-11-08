@@ -119,42 +119,42 @@ def create_item_with_correct_classification(world: BananaManiaWorld, name: str) 
     return BananaManiaItem(name, classification, ITEM_NAME_TO_ID[name], world.player)
 
 
-INDIVIDUAL_WORLD_UNLOCKS = [
-    "World 2: Volcanic Magma Unlock",
-    "World 3: Under the Ocean Unlock",
-    "World 4: Inside a Whale Unlock",
-    "World 5: Amusement Park Unlock",
-    "World 6: Boiling Pot Unlock",
-    "World 7: Bubbly Washing Machine Unlock",
-    "World 8: Clock Tower Factory Unlock",
-    "World 9: Space Colony Unlock",
-    "World 10: Dr. Bad-Boon's Base Unlock",
-]
-
-
 def create_all_items(world: BananaManiaWorld) -> None:
     itempool: list[Item] = []
-
-    # [NOTICE] getattr was an ai suggestion, but there might be better ways to handle it.
-    # The individual world unlocks were also an ai suggestion
-    # The rest of this is either hand written, or touched by an ai like once or twice for minor fixes. Feel free
-    # to rewrite as you see fit, but this file is mostly fine minus the below section being slightly ai suggested.
 
     # SMB 2 worlds
     if world.options.world_structure == 0:  # progression
         itempool += [world.create_item("Progressive World Unlock") for _ in range(9)]
     else:  # worlds
-        itempool += [world.create_item(name) for name in INDIVIDUAL_WORLD_UNLOCKS]
+        itempool += [world.create_item(name) for name in ITEM_NAME_TO_ID[2:10]]
 
-    for challenge_diff in ["casual", "normal", "expert", "master"]:
-        if getattr(world.options, f"smb1_{challenge_diff}"):
-            itempool.append(world.create_item(f"SMB1 {challenge_diff.capitalize()} Challenge Mode Unlock"))
-        if getattr(world.options, f"smb2_{challenge_diff}"):
-            itempool.append(world.create_item(f"SMB2 {challenge_diff.capitalize()} Challenge Mode Unlock"))
+    if world.options.smb1_casual == 1:
+        itempool.append(world.create_item(f"SMB1 Casual Challenge Mode Unlock"))
+    if world.options.smb1_normal == 1:
+        itempool.append(world.create_item(f"SMB1 Normal Challenge Mode Unlock"))
+    if world.options.smb1_expert == 1:
+        itempool.append(world.create_item(f"SMB1 Expert Challenge Mode Unlock"))
+    if world.options.smb1_master == 1:
+        itempool.append(world.create_item(f"SMB1 Master Challenge Mode Unlock"))
+        
+    if world.options.smb1_normal == 1:
+        itempool.append(world.create_item(f"SMB2 Casual Challenge Mode Unlock"))
+    if world.options.smb1_normal == 1:
+        itempool.append(world.create_item(f"SMB2 Normal Challenge Mode Unlock"))
+    if world.options.smb1_normal == 1:
+        itempool.append(world.create_item(f"SMB2 Expert Challenge Mode Unlock"))
+    if world.options.smb1_normal == 1:
+        itempool.append(world.create_item(f"SMB2 Master Challenge Mode Unlock"))
 
-    for special_mode in ["reverse", "dark_banana", "golden_banana", "original_stages"]:
-        if getattr(world.options, f"{special_mode}_mode"):
-            itempool.append(world.create_item(f"{" ".join(special_mode.split("_")).title()} Mode Unlock"))
+    if world.options.reverse_mode == 1:
+        itempool.append(world.create_item(f"Reverse Mode Unlock"))
+    if world.options.dark_banana_mode == 1:
+        itempool.append(world.create_item(f"Dark Banana Mode Unlock"))
+    if world.options.golden_banana_mode == 1:
+        itempool.append(world.create_item(f"Golden Banana Mode Unlock"))
+    if world.options.original_stages_mode == 1:
+        itempool.append(world.create_item(f"Original Stages Mode Unlock"))
+        
 
     if world.options.deluxe_stages:
         if world.options.deluxe_unlock_style == 0: # all
@@ -170,10 +170,10 @@ def create_all_items(world: BananaManiaWorld) -> None:
     itempool.append(world.create_item("Fast Switches"))
     itempool.append(world.create_item("Pause Switches"))
 
-    # Progressive Time Increases increase by +10, to a max of 60. You start with 10 seconds, so 5.
+    # 5 Time increases, you start at 10 seconds, max of 60. Increases by 10 seconds each item.
     itempool += [world.create_item("Progressive Time Increase") for _ in range(5)]
 
-    # Character unlock items.
+    # Character unlock items, these are just filler
     for character in ["AiAi", "MeeMee", "Baby", "GonGon", "YanYan", "Doctor",
                       "Jam", "Jet", "Sonic", "Tails", "Beat", "Kiryu"]:
         itempool.append(world.create_item(character))
