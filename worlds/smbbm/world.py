@@ -28,8 +28,6 @@ class BananaManiaWorld(World):
     origin_region_name = "Menu"
 
     ut_can_gen_without_yaml = True
-    
-    def custom_ut_sort(self, region_label)
 
     def generate_early(self) -> None:
 
@@ -47,8 +45,6 @@ class BananaManiaWorld(World):
                 if hasattr(self.options, key):
                     getattr(self.options, key).value = value
 
-    # NOTICE: All of the below is from the APQuest template, and fill_slot_data/interpret_slot_data is hand written from the UT docs
-    # for universal tracker support. Leave all of this be.
     def create_regions(self) -> None:
         regions.create_and_connect_regions(self)
         locations.create_all_locations(self)
