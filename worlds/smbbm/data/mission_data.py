@@ -20,7 +20,7 @@ class MissionType(IntEnum):
     STAGE_COMPLETE = 10,
 
 class MissionData():
-    def __init__(self, mission_type: MissionType, req_items: list[Rule], amount: int | None = None):
+    def __init__(self, mission_type: MissionType, req_items: dict[Difficulty, Rule], amount: int | None = None):
         self.mission_type = mission_type
         self.req_items = self.fill_in_req_items(req_items)
         self.amount = amount
@@ -69,11 +69,12 @@ class MissionData():
         return self.req_items[difficulty.value]
         
 class StageData:
-    def __init__(self, base_id: int, name: str, region: str, missions: list[MissionData]):
+    def __init__(self, base_id: int, name: str, region: str, missions: list[MissionData], shared_items_req: list[Rule] = []):
         self.base_id = base_id
         self.name = name
         self.region = region
         self.missions = missions
+        self.shared_items_req = shared_items_req # Not added yet
         
     def get_mission_loc_id(self, mission_idx):
         return self.base_id + self.missions[mission_idx].mission_type.value
@@ -125,7 +126,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
             StageData(
                 20, "Hollow", "World 1",
                 [
-                    MissionData(MissionType.CLEAR, [Has("Progressive Time Increase"), True_()]),
+                    MissionData(MissionType.CLEAR, [time(1), True_()]),
                     MissionData(MissionType.BANANA, [], 20),
                     MissionData(MissionType.TIME, [], 10)
                 ]
@@ -141,10 +142,10 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
             StageData(
                 40, "Switches", "World 1",
                 [
-                    MissionData(MissionType.CLEAR, []),
+                    MissionData(MissionType.CLEAR, [Has("Normal Switches")]),
                     MissionData(MissionType.BANANA, [], 25),
                     MissionData(MissionType.TIME, [], 10),
-                    MissionData(MissionType.GREEN, [HasAll("Progressive Time Increase", "Normal Switches")])
+                    MissionData(MissionType.GREEN, [time(1) & "Normal Switches"])
                 ]
             ),
             StageData(
@@ -976,15 +977,11 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
         RegionData(name="Deluxe Beginner Pack", req_items=Has("Deluxe Mode") | Has("Deluxe Beginner Stages Pack"), stage_data=[
             StageData(
                 2010, "Edge", "Deluxe Beginner Pack",
-                [
-                    MissionData(MissionType.CLEAR, []),
-                ]
+                [MissionData(MissionType.CLEAR, [])]
             ),
             StageData(
                 2020, "Escalators", "Deluxe Beginner Pack",
-                [
-                    MissionData(MissionType.CLEAR, [Has("Progressive Time Increase"), True_()]),
-                ]
+                [MissionData(MissionType.CLEAR, [Has("Progressive Time Increase"), True_()]),]
             ),
             StageData(
                 2030, "Serpentine", "Deluxe Beginner Pack",
@@ -1461,139 +1458,139 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
     "Original Stages Mode": 
         RegionData(name="Original Stages Mode", req_items=Has("Original Stages Mode"), stage_data=[
             StageData(
-                8010, "Catwalk", "Reverse Mode",
+                8010, "Catwalk", "Original Stages Mode",
+                [
+                    MissionData(MissionType.CLEAR, [time(4)]),
+                ]
+            ),
+            StageData(
+                8020, "Polar", "Original Stages Mode",
                 [
                     MissionData(MissionType.CLEAR, []),
                 ]
             ),
             StageData(
-                8020, "Polar", "Reverse Mode",
+                8030, "Launchers", "Original Stages Mode",
                 [
-                    MissionData(MissionType.CLEAR, [Has("Progressive Time Increase"), True_()]),
+                    MissionData(MissionType.CLEAR, [time(1)]),
                 ]
             ),
             StageData(
-                8030, "Launchers", "Reverse Mode",
+                8040, "Arthropod", "Original Stages Mode",
                 [
-                    MissionData(MissionType.CLEAR, []),
+                    MissionData(MissionType.CLEAR, [time(1)]),
                 ]
             ),
             StageData(
-                8040, "Arthropod", "Reverse Mode",
+                8050, "Polar Large", "Original Stages Mode",
                 [
-                    MissionData(MissionType.CLEAR, []),
+                    MissionData(MissionType.CLEAR, [time(4)]),
                 ]
             ),
             StageData(
-                8050, "Polar Large", "Reverse Mode",
+                8060, "Chaos", "Original Stages Mode",
                 [
-                    MissionData(MissionType.CLEAR, []),
+                    MissionData(MissionType.CLEAR, [time(5)]),
                 ]
             ),
             StageData(
-                8060, "Chaos", "Reverse Mode",
+                8070, "Exam-C", "Original Stages Mode",
                 [
-                    MissionData(MissionType.CLEAR, []),
+                    MissionData(MissionType.CLEAR, [time(4)]),
                 ]
             ),
             StageData(
-                8070, "Exam-C", "Reverse Mode",
+                8080, "Tracks", "Original Stages Mode",
                 [
-                    MissionData(MissionType.CLEAR, []),
+                    MissionData(MissionType.CLEAR, [time(4)]),
                 ]
             ),
             StageData(
-                8080, "Tracks", "Reverse Mode",
-                [
-                    MissionData(MissionType.CLEAR, []),
-                ]
-            ),
-            StageData(
-                8090, "Twin Attacker", "Reverse Mode",
+                8090, "Twin Attacker", "Original Stages Mode",
                 [
                     MissionData(MissionType.CLEAR, []),
                 ]
             ),
             StageData(
-                8100, "8 Bracelets", "Reverse Mode",
+                8100, "8 Bracelets", "Original Stages Mode",
+                [
+                    MissionData(MissionType.CLEAR, [time(2)]),
+                ]
+            ),
+            StageData(
+                8010, "Curvature", "Original Stages Mode",
+                [
+                    MissionData(MissionType.CLEAR, [time(4)]),
+                ]
+            ),
+            StageData(
+                8020, "Soft Cream", "Original Stages Mode",
+                [
+                    MissionData(MissionType.CLEAR, [time(1) & Has("Fast Switches")]),
+                ]
+            ),
+            StageData(
+                8030, "Air Hockey", "Original Stages Mode",
                 [
                     MissionData(MissionType.CLEAR, []),
                 ]
             ),
             StageData(
-                8010, "Curvature", "Reverse Mode",
+                8040, "Cylinders", "Original Stages Mode",
+                [
+                    MissionData(MissionType.CLEAR, [time(1)]),
+                ]
+            ),
+            StageData(
+                8050, "Notch", "Original Stages Mode",
+                [
+                    MissionData(MissionType.CLEAR, [time(1)]),
+                ]
+            ),
+            StageData(
+                8060, "Long Torus", "Original Stages Mode",
+                [
+                    MissionData(MissionType.CLEAR, [time(2)]),
+                ]
+            ),
+            StageData(
+                8070, "Clock Face", "Original Stages Mode",
+                [
+                    MissionData(MissionType.CLEAR, [time(2)]),
+                ]
+            ),
+            StageData(
+                8080, "Wave Master", "Original Stages Mode",
+                [
+                    MissionData(MissionType.CLEAR, [time(2)]),
+                ]
+            ),
+            StageData(
+                8090, "Stamina Master", "Original Stages Mode",
+                [
+                    MissionData(MissionType.CLEAR, [time(1)]),
+                ]
+            ),
+            StageData(
+                8100, "Dance Master", "Original Stages Mode",
                 [
                     MissionData(MissionType.CLEAR, []),
                 ]
             ),
             StageData(
-                8020, "Soft Cream", "Reverse Mode",
-                [
-                    MissionData(MissionType.CLEAR, [Has("Progressive Time Increase"), True_()]),
-                ]
-            ),
-            StageData(
-                8030, "Air Hockey", "Reverse Mode",
+                8090, "Dodge Master", "Original Stages Mode",
                 [
                     MissionData(MissionType.CLEAR, []),
                 ]
             ),
             StageData(
-                8040, "Cylinders", "Reverse Mode",
+                8100, "Bridge Master", "Original Stages Mode",
                 [
-                    MissionData(MissionType.CLEAR, []),
+                    MissionData(MissionType.CLEAR, [time(1)]),
                 ]
             ),
             StageData(
-                8050, "Notch", "Reverse Mode",
-                [
-                    MissionData(MissionType.CLEAR, []),
-                ]
-            ),
-            StageData(
-                8060, "Long Torus", "Reverse Mode",
-                [
-                    MissionData(MissionType.CLEAR, []),
-                ]
-            ),
-            StageData(
-                8070, "Clock Face", "Reverse Mode",
-                [
-                    MissionData(MissionType.CLEAR, []),
-                ]
-            ),
-            StageData(
-                8080, "Wave Master", "Reverse Mode",
-                [
-                    MissionData(MissionType.CLEAR, []),
-                ]
-            ),
-            StageData(
-                8090, "Stamina Master", "Reverse Mode",
-                [
-                    MissionData(MissionType.CLEAR, []),
-                ]
-            ),
-            StageData(
-                8100, "Dance Master", "Reverse Mode",
-                [
-                    MissionData(MissionType.CLEAR, []),
-                ]
-            ),
-            StageData(
-                8090, "Dodge Master", "Reverse Mode",
-                [
-                    MissionData(MissionType.CLEAR, []),
-                ]
-            ),
-            StageData(
-                8100, "Bridge Master", "Reverse Mode",
-                [
-                    MissionData(MissionType.CLEAR, []),
-                ]
-            ),
-            StageData(
-                8100, "Synchronized", "Reverse Mode",
+                8100, "Synchronized", "Original Stages Mode",
                 [
                     MissionData(MissionType.CLEAR, []),
                 ]
