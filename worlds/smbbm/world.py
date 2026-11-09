@@ -22,23 +22,14 @@ class BananaManiaWorld(World):
     options_dataclass = smb_options.BananaManiaOptions
     options: smb_options.BananaManiaOptions
 
-    location_name_to_id = locations.LOCATION_NAME_TO_ID
+    location_name_to_id = locations.get_location_names_with_ids()
     item_name_to_id = items.ITEM_NAME_TO_ID
 
     origin_region_name = "Menu"
 
     ut_can_gen_without_yaml = True
-
-    # Sort by region then location ids within that region
-    # NOTICE: This was ai written, but I came up with the concept. In general, I would recommend just rewriting this to be a better form of
-    # sorting each region by their ids, in the order of the WORLD_REGIONS. It looks nice.
-    # def custom_ut_sort(self, region_label: str, location_label: str) -> int:
-    #     if region_label in regions.WORLD_REGIONS:
-    #         region_index = regions.WORLD_REGIONS.index(region_label)
-    #     else:
-    #         region_index = len(regions.WORLD_REGIONS)
-    #     location_id = self.location_name_to_id.get(location_label, 999999)
-    #     return region_index * 1_000_000 + location_id
+    
+    def custom_ut_sort(self, region_label)
 
     def generate_early(self) -> None:
 

@@ -16,33 +16,53 @@ if TYPE_CHECKING:
 class BananaManiaLocation(Location):
     game = "Super Monkey Ball Banana Mania"
 
-def get_location_names_with_ids(location_names: list[str]) -> dict[str, int | None]:
-    return {location_name: LOCATION_NAME_TO_ID[location_name] for location_name in location_names}
+def get_location_names_with_ids() -> dict[str, int | None]:
+    loc_list = {}
+    
+    for region in WORLD_REGIONS:
+        region_loc_list = MISSION_DATA_DICT[region].get_region_locations()
+        for loc in region_loc_list:
+            loc_list[loc[0]] = loc[1]
+            
+    return loc_list
 
+def get_disabled_regions(world: BananaManiaWorld) -> list[str]:
+    disabled_regions = []
+    if world.options.reverse_mode == 0:
+        disabled_regions.append("Reverse Mode")
+    if world.options.deluxe_stages == 0:
+        disabled_regions.append("Deluxe Beginner Pack")
+        disabled_regions.append("Deluxe Advanced Pack")
+        disabled_regions.append("Deluxe EX Pack")
+    
+    return disabled_regions
 
 def create_all_locations(world: BananaManiaWorld) -> None:
     create_regular_locations(world)
     create_events(world) 
 
-# This is janky right now just while I test my new data method
 def create_regular_locations(world: BananaManiaWorld) -> None:
-    region_idx = 0
-    stage_idx = 0
+    disabled_regions = get_disabled_regions(world)
     
     for region in WORLD_REGIONS:
         region_data = MISSION_DATA_DICT[region]
         world_region = world.get_region(region)
-        region_idx += 10
+        
+        if region in disabled_regions:
+            continue
+        
         if len(region_data) != 0:
-            world.set_rule("region", region_data.req_items)
-            stage_idx = 0
+            region_entrance = world.get_entrance(f"Menu to {region}")
+            world.set_rule(region_entrance, region_data.req_items)
             
             for stage in region_data.stage_data:
-                stage_idx += 1
-                
-                for mission in stage.missions:
-                    world_region.add_locations({mission.mission_name: region_idx + stage_idx + mission.mission_type.value})
-                    world.set_rule(mission.get_mission_item_req(world.options.logic_difficulty))
+                for idx, mission in enumerate(stage.missions):
+                    loc_name = stage.get_named_mission_location(idx)
+                    loc_id = stage.get_mission_loc_id(idx)
+                    
+                    world_region.add_locations({loc_name: loc_id}, BananaManiaLocation)
+                    loc = world.get_location(loc_name)
+                    world.set_rule(loc, mission.get_mission_item_req(world.options.logic_difficulty))
     
 
 def create_events(world: BananaManiaWorld) -> None:

@@ -9,28 +9,28 @@ if TYPE_CHECKING:
 
 ITEM_NAME_TO_ID = {
     "Progressive World Unlock": 1,
-    "World 2: Volcanic Magma Unlock": 2,
-    "World 3: Under the Ocean Unlock": 3,
-    "World 4: Inside a Whale Unlock": 4,
-    "World 5: Amusement Park Unlock": 5,
-    "World 6: Boiling Pot Unlock": 6,
-    "World 7: Bubbly Washing Machine Unlock": 7,
-    "World 8: Clock Tower Factory Unlock": 8,
-    "World 9: Space Colony Unlock": 9,
-    "World 10: Dr. Bad-Boon's Base Unlock": 10,
-    "SMB1 Casual Challenge Mode Unlock": 11,
-    "SMB1 Normal Challenge Mode Unlock": 12,
-    "SMB1 Expert Challenge Mode Unlock": 13,
-    "SMB1 Master Challenge Mode Unlock": 14,
-    "SMB2 Casual Challenge Mode Unlock": 15,
-    "SMB2 Normal Challenge Mode Unlock": 16,
-    "SMB2 Expert Challenge Mode Unlock": 17,
-    "SMB2 Master Challenge Mode Unlock": 18,
-    "Reverse Mode Unlock": 19,
-    "Dark Banana Mode Unlock": 20,
-    "Golden Banana Mode Unlock": 21,
-    "Original Stages Mode Unlock": 22,
-    "Deluxe Mode Unlock": 23,
+    "World 2: Volcanic Magma": 2,
+    "World 3: Under the Ocean": 3,
+    "World 4: Inside a Whale": 4,
+    "World 5: Amusement Park": 5,
+    "World 6: Boiling Pot": 6,
+    "World 7: Bubbly Washing Machine": 7,
+    "World 8: Clock Tower Factory": 8,
+    "World 9: Space Colony": 9,
+    "World 10: Dr. Bad-Boon's Base": 10,
+    "SMB1 Casual Challenge Mode": 11,
+    "SMB1 Normal Challenge Mode": 12,
+    "SMB1 Expert Challenge Mode": 13,
+    "SMB1 Master Challenge Mode": 14,
+    "SMB2 Casual Challenge Mode": 15,
+    "SMB2 Normal Challenge Mode": 16,
+    "SMB2 Expert Challenge Mode": 17,
+    "SMB2 Master Challenge Mode": 18,
+    "Reverse Mode": 19,
+    "Dark Banana Mode": 20,
+    "Golden Banana Mode": 21,
+    "Original Stages Mode": 22,
+    "Deluxe Mode": 23,
     "Deluxe Beginner Stages Pack": 24,
     "Deluxe Advanced Stages Pack": 25,
     "Deluxe EX Stages Pack": 26,
@@ -58,28 +58,28 @@ ITEM_NAME_TO_ID = {
 
 DEFAULT_ITEM_CLASSIFICATIONS = {
     "Progressive World Unlock": ItemClassification.progression,
-    "World 2: Volcanic Magma Unlock": ItemClassification.progression,
-    "World 3: Under the Ocean Unlock": ItemClassification.progression,
-    "World 4: Inside a Whale Unlock": ItemClassification.progression,
-    "World 5: Amusement Park Unlock": ItemClassification.progression,
-    "World 6: Boiling Pot Unlock": ItemClassification.progression,
-    "World 7: Bubbly Washing Machine Unlock": ItemClassification.progression,
-    "World 8: Clock Tower Factory Unlock": ItemClassification.progression,
-    "World 9: Space Colony Unlock": ItemClassification.progression,
-    "World 10: Dr. Bad-Boon's Base Unlock": ItemClassification.progression,
-    "SMB1 Casual Challenge Mode Unlock": ItemClassification.progression,
-    "SMB1 Normal Challenge Mode Unlock": ItemClassification.progression,
-    "SMB1 Expert Challenge Mode Unlock": ItemClassification.progression,
-    "SMB1 Master Challenge Mode Unlock": ItemClassification.progression,
-    "SMB2 Casual Challenge Mode Unlock": ItemClassification.progression,
-    "SMB2 Normal Challenge Mode Unlock": ItemClassification.progression,
-    "SMB2 Expert Challenge Mode Unlock": ItemClassification.progression,
-    "SMB2 Master Challenge Mode Unlock": ItemClassification.progression,
-    "Reverse Mode Unlock": ItemClassification.progression,
-    "Dark Banana Mode Unlock": ItemClassification.progression,
-    "Golden Banana Mode Unlock": ItemClassification.progression,
-    "Original Stages Mode Unlock": ItemClassification.progression,
-    "Deluxe Mode Unlock": ItemClassification.progression,
+    "World 2: Volcanic Magma": ItemClassification.progression,
+    "World 3: Under the Ocean": ItemClassification.progression,
+    "World 4: Inside a Whale": ItemClassification.progression,
+    "World 5: Amusement Park": ItemClassification.progression,
+    "World 6: Boiling Pot": ItemClassification.progression,
+    "World 7: Bubbly Washing Machine": ItemClassification.progression,
+    "World 8: Clock Tower Factory": ItemClassification.progression,
+    "World 9: Space Colony": ItemClassification.progression,
+    "World 10: Dr. Bad-Boon's Base": ItemClassification.progression,
+    "SMB1 Casual Challenge Mode": ItemClassification.progression,
+    "SMB1 Normal Challenge Mode": ItemClassification.progression,
+    "SMB1 Expert Challenge Mode": ItemClassification.progression,
+    "SMB1 Master Challenge Mode": ItemClassification.progression,
+    "SMB2 Casual Challenge Mode": ItemClassification.progression,
+    "SMB2 Normal Challenge Mode": ItemClassification.progression,
+    "SMB2 Expert Challenge Mode": ItemClassification.progression,
+    "SMB2 Master Challenge Mode": ItemClassification.progression,
+    "Reverse Mode": ItemClassification.progression,
+    "Dark Banana Mode": ItemClassification.progression,
+    "Golden Banana Mode": ItemClassification.progression,
+    "Original Stages Mode": ItemClassification.progression,
+    "Deluxe Mode": ItemClassification.progression,
     "Deluxe Beginner Stages Pack": ItemClassification.progression,
     "Deluxe Advanced Stages Pack": ItemClassification.progression,
     "Deluxe EX Stages Pack": ItemClassification.progression,
@@ -105,6 +105,18 @@ DEFAULT_ITEM_CLASSIFICATIONS = {
     "Kiryu": ItemClassification.filler,
 }
 
+SMB2_WORLD_UNLOCKS = [
+    "World 2: Volcanic Magma",
+    "World 3: Under the Ocean",
+    "World 4: Inside a Whale",
+    "World 5: Amusement Park",
+    "World 6: Boiling Pot",
+    "World 7: Bubbly Washing Machine",
+    "World 8: Clock Tower Factory",
+    "World 9: Space Colony",
+    "World 10: Dr. Bad-Boon's Base"
+]
+
 class BananaManiaItem(Item):
     game = "Super Monkey Ball Banana Mania"
 
@@ -126,39 +138,39 @@ def create_all_items(world: BananaManiaWorld) -> None:
     if world.options.world_structure == 0:  # progression
         itempool += [world.create_item("Progressive World Unlock") for _ in range(9)]
     else:  # worlds
-        itempool += [world.create_item(name) for name in ITEM_NAME_TO_ID[2:10]]
+        itempool += [world.create_item(name) for name in SMB2_WORLD_UNLOCKS]
 
-    if world.options.smb1_casual == 1:
-        itempool.append(world.create_item(f"SMB1 Casual Challenge Mode Unlock"))
-    if world.options.smb1_normal == 1:
-        itempool.append(world.create_item(f"SMB1 Normal Challenge Mode Unlock"))
-    if world.options.smb1_expert == 1:
-        itempool.append(world.create_item(f"SMB1 Expert Challenge Mode Unlock"))
-    if world.options.smb1_master == 1:
-        itempool.append(world.create_item(f"SMB1 Master Challenge Mode Unlock"))
+    # if world.options.smb1_casual == 1:
+    #     itempool.append(world.create_item(f"SMB1 Casual Challenge Mode"))
+    # if world.options.smb1_normal == 1:
+    #     itempool.append(world.create_item(f"SMB1 Normal Challenge Mode"))
+    # if world.options.smb1_expert == 1:
+    #     itempool.append(world.create_item(f"SMB1 Expert Challenge Mode"))
+    # if world.options.smb1_master == 1:
+    #     itempool.append(world.create_item(f"SMB1 Master Challenge Mode"))
         
-    if world.options.smb1_normal == 1:
-        itempool.append(world.create_item(f"SMB2 Casual Challenge Mode Unlock"))
-    if world.options.smb1_normal == 1:
-        itempool.append(world.create_item(f"SMB2 Normal Challenge Mode Unlock"))
-    if world.options.smb1_normal == 1:
-        itempool.append(world.create_item(f"SMB2 Expert Challenge Mode Unlock"))
-    if world.options.smb1_normal == 1:
-        itempool.append(world.create_item(f"SMB2 Master Challenge Mode Unlock"))
+    # if world.options.smb1_normal == 1:
+    #     itempool.append(world.create_item(f"SMB2 Casual Challenge Mode"))
+    # if world.options.smb1_normal == 1:
+    #     itempool.append(world.create_item(f"SMB2 Normal Challenge Mode"))
+    # if world.options.smb1_normal == 1:
+    #     itempool.append(world.create_item(f"SMB2 Expert Challenge Mode"))
+    # if world.options.smb1_normal == 1:
+    #     itempool.append(world.create_item(f"SMB2 Master Challenge Mode"))
 
     if world.options.reverse_mode == 1:
-        itempool.append(world.create_item(f"Reverse Mode Unlock"))
+        itempool.append(world.create_item(f"Reverse Mode"))
     if world.options.dark_banana_mode == 1:
-        itempool.append(world.create_item(f"Dark Banana Mode Unlock"))
+        itempool.append(world.create_item(f"Dark Banana Mode"))
     if world.options.golden_banana_mode == 1:
-        itempool.append(world.create_item(f"Golden Banana Mode Unlock"))
+        itempool.append(world.create_item(f"Golden Banana Mode"))
     if world.options.original_stages_mode == 1:
-        itempool.append(world.create_item(f"Original Stages Mode Unlock"))
+        itempool.append(world.create_item(f"Original Stages Mode"))
         
 
     if world.options.deluxe_stages:
         if world.options.deluxe_unlock_style == 0: # all
-            itempool.append(world.create_item("Deluxe Mode Unlock"))
+            itempool.append(world.create_item("Deluxe Mode"))
         else:
             itempool.append(world.create_item("Deluxe Beginner Stages Pack"))
             itempool.append(world.create_item("Deluxe Advanced Stages Pack"))
@@ -173,7 +185,7 @@ def create_all_items(world: BananaManiaWorld) -> None:
     # 5 Time increases, you start at 10 seconds, max of 60. Increases by 10 seconds each item.
     itempool += [world.create_item("Progressive Time Increase") for _ in range(5)]
 
-    # Character unlock items, these are just filler
+    # Character items, these are just filler
     for character in ["AiAi", "MeeMee", "Baby", "GonGon", "YanYan", "Doctor",
                       "Jam", "Jet", "Sonic", "Tails", "Beat", "Kiryu"]:
         itempool.append(world.create_item(character))
@@ -182,5 +194,7 @@ def create_all_items(world: BananaManiaWorld) -> None:
     number_of_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
     needed_number_of_filler_items = number_of_unfilled_locations - len(itempool)
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
+
+    print(itempool)
 
     world.multiworld.itempool += itempool
