@@ -8,7 +8,7 @@ import json
 from BaseClasses import Location
 from . import items
 from .regions import WORLD_REGIONS
-from .data.mission_data import MISSION_DATA_DICT
+from .mission_data import MISSION_DATA_DICT
 
 if TYPE_CHECKING:
     from .world import BananaManiaWorld
@@ -30,6 +30,12 @@ def get_disabled_regions(world: BananaManiaWorld) -> list[str]:
     disabled_regions = []
     if world.options.reverse_mode == 0:
         disabled_regions.append("Reverse Mode")
+    if world.options.dark_banana_mode == 0:
+        disabled_regions.append("Dark Banana Mode")
+    if world.options.golden_banana_mode == 0:
+        disabled_regions.append("Golden Banana Mode")
+    if world.options.original_stages_mode == 0:
+        disabled_regions.append("Original Stages Mode")
     if world.options.deluxe_stages == 0:
         disabled_regions.append("Deluxe Beginner Pack")
         disabled_regions.append("Deluxe Advanced Pack")
