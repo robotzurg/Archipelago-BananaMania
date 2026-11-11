@@ -195,6 +195,4 @@ def create_all_items(world: BananaManiaWorld) -> None:
     needed_number_of_filler_items = number_of_unfilled_locations - len(itempool)
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
 
-    print(itempool)
-
     world.multiworld.itempool += itempool

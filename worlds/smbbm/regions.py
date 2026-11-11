@@ -26,6 +26,7 @@ WORLD_REGIONS = [
     # "SMB2 Normal",
     # "SMB2 Expert",
     # "SMB2 Master",
+    "Deluxe Mode",
     "Deluxe Beginner Pack",
     "Deluxe Advanced Pack",
     "Deluxe EX Pack",

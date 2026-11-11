@@ -1,4 +1,4 @@
-from rule_builder.rules import Has, True_, Rule, HasAll, HasAny, OptionFilter
+from rule_builder.rules import Has, True_, Rule, HasAll, HasAny, OptionFilter, AtLeast, And, Or
 from .options import WorldStructure, DeluxeUnlockStyle
 from math import ceil
 from enum import IntEnum
@@ -21,12 +21,17 @@ class MissionType(IntEnum):
     STAGE_COMPLETE = 10,
 
 class MissionData():
-    def __init__(self, mission_type: MissionType, req_items: list[Rule], amount: int | str | None = None, add_clear_reqs: bool = False):
+    def __init__(self, mission_type: MissionType, req_items: list[Rule], amount: int | str | None = None, add_clear_reqs: bool = False, category_mission: bool = False):
         self.mission_type = mission_type
         self.req_items = self.fill_in_req_items(req_items)
         self.amount = amount
         self.mission_name: str = self.get_mission_name()
         self.add_clear_reqs = add_clear_reqs
+        if self.mission_type == MissionType.NONSTOP or self.mission_type == MissionType.TIME:
+            self.add_clear_reqs = True
+        
+        # Has unique item rules assigned later
+        self.category_mission = category_mission 
 
     def add_req_items_rules(self, req_items):
         for idx, rule in enumerate(req_items):
@@ -71,7 +76,7 @@ class MissionData():
         
         return name
     
-    def get_mission_item_req(self, difficulty: Difficulty):
+    def get_mission_item_req(self, difficulty: Difficulty) -> Rule:
         return self.req_items[difficulty.value]
 
 class StageData:
@@ -119,12 +124,49 @@ class RegionData:
             loc_list.extend(mission_loc_list)
             
         return loc_list
+    
+    def get_full_stage_clear_rule(self, difficulty: Difficulty) -> Rule:
+        stage_rules = []
+        for stage in self.stage_data:
+            if stage.missions[0].mission_type != MissionType.CLEAR:
+                continue
+            stage_rules.append((stage.missions[0].get_mission_item_req(difficulty)))
+            
+        return And(*stage_rules)
 
 class CategoryData:
-    def __init__(self, name: str, stage_data: list[StageData], missions: list[MissionData]):
+    def __init__(self, base_id: int, name: str, req_items: Rule, stage_data: list[StageData], missions: list[MissionData]):
+        self.base_id = base_id
         self.name = name
+        self.req_items = req_items
         self.stage_data = stage_data
         self.missions = missions
+        
+    def __len__(self):
+            return len(self.stage_data)
+        
+    def get_region_locations(self) -> list[tuple[str, int]]:
+        loc_list = []
+        for idx, _ in enumerate(self.missions):
+            loc_list.append((self.get_named_mission_location(idx), self.get_mission_loc_id(idx)))
+            
+        return loc_list
+        
+    def get_mission_loc_id(self, mission_idx):
+            return self.base_id + self.missions[mission_idx].mission_type.value
+            
+    def get_named_mission_location(self, mission_idx):
+        return f"[{self.name}] {self.missions[mission_idx].mission_name}"
+        
+    def get_stage_win_rule(self, amount: int, difficulty: Difficulty) -> Rule:
+        stage_rules = []
+        for stage in self.stage_data:
+            if stage.missions[0].mission_type != MissionType.CLEAR:
+                continue
+            stage_rules.append((stage.missions[0].get_mission_item_req(difficulty)))
+            
+        return AtLeast(amount, *stage_rules)
+             
     
 # Returns a rule with the amount of time a level needs, to prevent a lot of annoying copypasting lol
 def time(amount: int) -> Rule:
@@ -193,8 +235,6 @@ def get_region_rule(region: str) -> Rule:
                 | Has("Deluxe EX Stages Pack", options=[OptionFilter(DeluxeUnlockStyle, DeluxeUnlockStyle.option_packs)])
             )
 
-# TODO: Add logic for banana/time/nonstop
-
 MISSION_DATA_DICT: dict[str, RegionData] = {
     "World 1": 
         RegionData(name="World 1", req_items=True_(), stage_data=[
@@ -211,7 +251,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(2), time(1), time(0)], 20),
-                    MissionData(MissionType.TIME, [], 10, add_clear_reqs=True)
+                    MissionData(MissionType.TIME, [], 10)
                 ]
             ),
             StageData(
@@ -253,7 +293,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(2)], 77),
-                    MissionData(MissionType.TIME, [], 10, add_clear_reqs=True)
+                    MissionData(MissionType.TIME, [], 10)
                 ]
             ),
             StageData(
@@ -261,8 +301,8 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(3), time(2), time(1)]),
                     MissionData(MissionType.BANANA, [time(3)], 70),
-                    MissionData(MissionType.TIME, [], 30, add_clear_reqs=True),
-                    MissionData(MissionType.NONSTOP, [], add_clear_reqs=True)
+                    MissionData(MissionType.TIME, [], 30),
+                    MissionData(MissionType.NONSTOP, [])
                 ]
             ),
             StageData(
@@ -270,7 +310,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), time(1)]),
                     MissionData(MissionType.BANANA, [time(2)], 20),
-                    MissionData(MissionType.TIME, [], 15, add_clear_reqs=True)
+                    MissionData(MissionType.TIME, [], 15)
                 ]
             ),
             StageData(
@@ -278,7 +318,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(3)]),
                     MissionData(MissionType.BANANA, [time(3)], 60),
-                    MissionData(MissionType.TIME, [], 35, add_clear_reqs=True)
+                    MissionData(MissionType.TIME, [], 35)
                 ]
             ),
         ]
@@ -290,7 +330,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(2)], 25),
-                    MissionData(MissionType.TIME, [], 10, add_clear_reqs=True)
+                    MissionData(MissionType.TIME, [], 10)
                 ]
             ),
             StageData(
@@ -306,7 +346,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, []),
                     MissionData(MissionType.BANANA, [time(1)], "Complete"),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 5)
                 ]
             ),
             StageData(
@@ -314,8 +354,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2), time(2), time(1)]),
                     MissionData(MissionType.BANANA, [time(2)], 55),
-                    MissionData(MissionType.TIME, [], 10),
-                    MissionData(MissionType.GREEN, [HasAll("Progressive Time Increase", "Normal Switches")])
+                    MissionData(MissionType.TIME, [], 30),
                 ]
             ),
             StageData(
@@ -323,8 +362,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(3)], 25),
-                    MissionData(MissionType.TIME, [], 10),
-                    MissionData(MissionType.NONSTOP, [])
+                    MissionData(MissionType.TIME, [], 15),
                 ]
             ),
             StageData(
@@ -340,7 +378,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(2)], 70),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
             StageData(
@@ -348,7 +386,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(3)], 30),
-                    MissionData(MissionType.TIME, [], 30),
+                    MissionData(MissionType.TIME, [], 15),
                     MissionData(MissionType.GREEN, [time(1) & Has("Normal Switches")]),
                     MissionData(MissionType.RED, [time(1) & Has("Normal Switches")]),
                 ]
@@ -358,7 +396,8 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(2)], 15),
-                    MissionData(MissionType.TIME, [], 15)
+                    MissionData(MissionType.TIME, [], 15),
+                    MissionData(MissionType.NONSTOP, []),
                 ]
             ),
             StageData(
@@ -366,7 +405,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2), time(1) & Has("Fast Switches")]),
                     MissionData(MissionType.BANANA, [time(2)], 15),
-                    MissionData(MissionType.TIME, [], 35)
+                    MissionData(MissionType.TIME, [], 15)
                 ]
             ),
         ]
@@ -378,7 +417,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(5)], "Complete"),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
             StageData(
@@ -386,7 +425,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(2)], 30),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 15)
                 ]
             ),
             StageData(
@@ -394,7 +433,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(2)], 70),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
             StageData(
@@ -402,7 +441,8 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(4), time(3)]),
                     MissionData(MissionType.BANANA, [time(5)], "Complete"),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 40),
+                    MissionData(MissionType.NONSTOP, [])
                 ]
             ),
             StageData(
@@ -410,8 +450,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(4)], "Complete"),
-                    MissionData(MissionType.TIME, [], 10),
-                    MissionData(MissionType.NONSTOP, [])
+                    MissionData(MissionType.TIME, [], 15),
                 ]
             ),
             StageData(
@@ -419,7 +458,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, []),
                     MissionData(MissionType.BANANA, [time(2)], 30),
-                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.TIME, [], 5),
                     MissionData(MissionType.GREEN, []),
                     MissionData(MissionType.RED, [time(1)])
                 ]
@@ -429,7 +468,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(2)], 40),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 15)
                 ]
             ),
             StageData(
@@ -437,7 +476,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(2), time(1)], 15),
-                    MissionData(MissionType.TIME, [], 30)
+                    MissionData(MissionType.TIME, [], 15)
                 ]
             ),
             StageData(
@@ -445,7 +484,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2), time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(3)], 25),
-                    MissionData(MissionType.TIME, [], 15)
+                    MissionData(MissionType.TIME, [], 30)
                 ]
             ),
             StageData(
@@ -453,7 +492,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(2), time(1)], 38),
-                    MissionData(MissionType.TIME, [], 35),
+                    MissionData(MissionType.TIME, [], 15),
                     MissionData(MissionType.GREEN, [time(1)])
                 ]
             ),
@@ -475,7 +514,8 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2), time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(2)], 15),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 15),
+                    MissionData(MissionType.NONSTOP, [])
                 ]
             ),
             StageData(
@@ -483,7 +523,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2)]),
                     MissionData(MissionType.BANANA, [time(5)], 25),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 15)
                 ]
             ),
             StageData(
@@ -491,8 +531,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(4)], 30),
-                    MissionData(MissionType.TIME, [], 10),
-                    MissionData(MissionType.GREEN, [HasAll("Progressive Time Increase", "Normal Switches")])
+                    MissionData(MissionType.TIME, [], 20),
                 ]
             ),
             StageData(
@@ -509,7 +548,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2)]),
                     MissionData(MissionType.BANANA, [time(4)], 10),
-                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.TIME, [], 20),
                     MissionData(MissionType.GREEN, [time(1)])
                 ]
             ),
@@ -518,7 +557,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(1)], 35),
-                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.TIME, [], 15),
                     MissionData(MissionType.GREEN, [time(1)]),
                     MissionData(MissionType.RED, [time(1)])
                 ]
@@ -537,7 +576,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(4), time(3), time(2)]),
                     MissionData(MissionType.BANANA, [time(4)], 40),
-                    MissionData(MissionType.TIME, [], 15)
+                    MissionData(MissionType.TIME, [], 55)
                 ]
             ),
             StageData(
@@ -545,7 +584,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(4)], "Complete"),
-                    MissionData(MissionType.TIME, [], 35)
+                    MissionData(MissionType.TIME, [], 30)
                 ]
             ),
         ]
@@ -557,7 +596,8 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2) & Has("Wormholes"), time(1) & Has("Wormholes")]),
                     MissionData(MissionType.BANANA, [time(3) & Has("Wormholes"), time(2) & Has("Wormholes")], 50),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 25),
+                    MissionData(MissionType.NONSTOP, [])
                 ]
             ),
             StageData(
@@ -565,7 +605,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(4), time(3)], 50),
-                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.TIME, [], 20),
                     MissionData(MissionType.GREEN, [time(2), time(2), time(1)])
                 ]
             ),
@@ -574,7 +614,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, []),
                     MissionData(MissionType.BANANA, [], 10),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 15)
                 ]
             ),
             StageData(
@@ -583,7 +623,6 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                     MissionData(MissionType.CLEAR, [Has("Wormholes")]),
                     MissionData(MissionType.BANANA, [time(4) & Has("Normal Switches") & Has("Wormholes")], "Complete"),
                     MissionData(MissionType.TIME, [], 10),
-                    MissionData(MissionType.GREEN, [HasAll("Progressive Time Increase", "Normal Switches")])
                 ]
             ),
             StageData(
@@ -591,7 +630,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1) & Has("Pause Switches"), True_()]),
                     MissionData(MissionType.BANANA, [time(1) & Has("Pause Switches")], 20),
-                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.TIME, [], 15),
                     MissionData(MissionType.NONSTOP, [])
                 ]
             ),
@@ -600,7 +639,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(3)], 25),
-                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.TIME, [], 15),
                     MissionData(MissionType.GREEN, [time(2)]),
                     MissionData(MissionType.RED, [time(3)])
                 ]
@@ -610,7 +649,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(2)], 25),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
             StageData(
@@ -618,7 +657,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1) & Has("Wormholes")]),
                     MissionData(MissionType.BANANA, [time(1) & Has("Wormholes")], 25),
-                    MissionData(MissionType.TIME, [], 30)
+                    MissionData(MissionType.TIME, [], 15)
                 ]
             ),
             StageData(
@@ -626,7 +665,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, []),
                     MissionData(MissionType.BANANA, [time(2)], "Complete"),
-                    MissionData(MissionType.TIME, [], 15)
+                    MissionData(MissionType.TIME, [], 10)
                 ]
             ),
             StageData(
@@ -634,7 +673,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(3), time(2)], 20),
-                    MissionData(MissionType.TIME, [], 35)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
         ]
@@ -663,7 +702,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(4), time(3), time(2)]),
                     MissionData(MissionType.BANANA, [time(5)], 70),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 35)
                 ]
             ),
             StageData(
@@ -671,8 +710,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, []),
                     MissionData(MissionType.BANANA, [time(2)], 35),
-                    MissionData(MissionType.TIME, [], 10),
-                    MissionData(MissionType.GREEN, [HasAll("Progressive Time Increase", "Normal Switches")])
+                    MissionData(MissionType.TIME, [], 5),
                 ]
             ),
             StageData(
@@ -680,8 +718,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1) & Has("Wormholes")]),
                     MissionData(MissionType.BANANA, [time(3) & Has("Wormholes")], 20),
-                    MissionData(MissionType.TIME, [], 10),
-                    MissionData(MissionType.NONSTOP, []),
+                    MissionData(MissionType.TIME, [], 30),
                     MissionData(MissionType.GREEN, [time(2) & Has("Wormholes")]),
                     MissionData(MissionType.RED, [time(1) & Has("Wormholes")])
                 ]
@@ -691,7 +728,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2), time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(2)], 20),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 30)
                 ]
             ),
             StageData(
@@ -699,7 +736,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(2)], 15),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
             StageData(
@@ -707,7 +744,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1) & Has("Wormholes"), Has("Wormholes"), True_()]),
                     MissionData(MissionType.BANANA, [time(1) & Has("Wormholes")], 20),
-                    MissionData(MissionType.TIME, [], 30),
+                    MissionData(MissionType.TIME, [], 15),
                     MissionData(MissionType.GREEN, [time(1) & Has("Wormholes"), time(1) & Has("Wormholes"), True_()])
                 ]
             ),
@@ -724,7 +761,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(1)], 10),
-                    MissionData(MissionType.TIME, [], 35)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
         ]
@@ -736,7 +773,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(1)], 20),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
             StageData(
@@ -744,7 +781,8 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, []),
                     MissionData(MissionType.BANANA, [time(1), time(1), True_()], 20),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.NONSTOP, [])
                 ]
             ),
             StageData(
@@ -752,7 +790,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(2)], 20),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
             StageData(
@@ -760,8 +798,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1) & Has("Normal Switches"), Has("Normal Switches"), True_()]),
                     MissionData(MissionType.BANANA, [time(2) & Has("Normal Switches")], 20),
-                    MissionData(MissionType.TIME, [], 10),
-                    MissionData(MissionType.GREEN, [HasAll("Progressive Time Increase", "Normal Switches")])
+                    MissionData(MissionType.TIME, [], 15)
                 ]
             ),
             StageData(
@@ -769,7 +806,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2)]),
                     MissionData(MissionType.BANANA, [time(2)], 15),
-                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.TIME, [], 30),
                     MissionData(MissionType.NONSTOP, [])
                 ]
             ),
@@ -778,7 +815,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(4), time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(5)], 15),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 50)
                 ]
             ),
             StageData(
@@ -786,7 +823,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(2)], 10),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 25)
                 ]
             ),
             StageData(
@@ -794,7 +831,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2), True_()]),
                     MissionData(MissionType.BANANA, [time(2)], 15),
-                    MissionData(MissionType.TIME, [], 30)
+                    MissionData(MissionType.TIME, [], 25)
                 ]
             ),
             StageData(
@@ -802,7 +839,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2)]),
                     MissionData(MissionType.BANANA, [time(2)], 10),
-                    MissionData(MissionType.TIME, [], 15),
+                    MissionData(MissionType.TIME, [], 25),
                     MissionData(MissionType.GREEN, [time(2)]),
                     MissionData(MissionType.RED, [time(2)])
                 ]
@@ -812,7 +849,8 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [Has("Fast Switches")]),
                     MissionData(MissionType.BANANA, [Has("Fast Switches") | time(1)], "Complete"),
-                    MissionData(MissionType.TIME, [], 35)
+                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.NONSTOP, [])
                 ]
             ),
         ]
@@ -824,7 +862,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2), time(1)]),
                     MissionData(MissionType.BANANA, [time(2), time(1)], 20),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
             StageData(
@@ -836,7 +874,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                         HasAny("Normal Switches", "Fast Switches") | (Has("Pause Switches") & time(1))
                     ]),
                     MissionData(MissionType.BANANA, [time(1) & Has("Normal Switches")], 20),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
             StageData(
@@ -856,7 +894,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                         time(2)
                     ]),
                     MissionData(MissionType.BANANA, [time(4) & HasAll("Normal Switches", "Fast Switches")], 30),
-                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.TIME, [], 40),
                     MissionData(MissionType.GREEN, [time(3) & HasAll("Normal Switches", "Fast Switches")])
                 ]
             ),
@@ -866,7 +904,6 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                     MissionData(MissionType.CLEAR, []),
                     MissionData(MissionType.BANANA, [], 28),
                     MissionData(MissionType.TIME, [], 10),
-                    MissionData(MissionType.NONSTOP, [])
                 ]
             ),
             StageData(
@@ -874,7 +911,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2), time(1)]),
                     MissionData(MissionType.BANANA, [time(3)], 10),
-                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.TIME, [], 30),
                     MissionData(MissionType.GREEN, [time(2)])
                 ]
             ),
@@ -883,7 +920,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2)]),
                     MissionData(MissionType.BANANA, [time(4)], 40),
-                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.TIME, [], 40),
                     MissionData(MissionType.GREEN, [time(3)])
                 ]
             ),
@@ -900,7 +937,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2), time(1)]),
                     MissionData(MissionType.BANANA, [time(2)], 10),
-                    MissionData(MissionType.TIME, [], 15)
+                    MissionData(MissionType.TIME, [], 30)
                 ]
             ),
             StageData(
@@ -908,7 +945,8 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, []),
                     MissionData(MissionType.BANANA, [time(1)], 10),
-                    MissionData(MissionType.TIME, [], 35)
+                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.NONSTOP, [])
                 ]
             ),
         ]
@@ -920,7 +958,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, []),
                     MissionData(MissionType.BANANA, [time(1)], 10),
-                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.TIME, [], 15),
                     MissionData(MissionType.GREEN, [time(1)]),
                     MissionData(MissionType.RED, [])
                 ]
@@ -930,7 +968,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(1)], 20),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 15)
                 ]
             ),
             StageData(
@@ -938,7 +976,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2), True_()]),
                     MissionData(MissionType.BANANA, [time(2), time(2), time(1)], 20),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 15)
                 ]
             ),
             StageData(
@@ -946,7 +984,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(1)], 20),
-                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.TIME, [], 15),
                     MissionData(MissionType.GREEN, [time(1)])
                 ]
             ),
@@ -955,7 +993,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(5), time(3), time(2)]),
                     MissionData(MissionType.BANANA, [time(5)], 20),
-                    MissionData(MissionType.TIME, [], 10),
+                    MissionData(MissionType.TIME, [], 40),
                     MissionData(MissionType.NONSTOP, [])
                 ]
             ),
@@ -964,7 +1002,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2)]),
                     MissionData(MissionType.BANANA, [time(2)], 10),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 30)
                 ]
             ),
             StageData(
@@ -972,7 +1010,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(1)], 12),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
             StageData(
@@ -980,7 +1018,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, []),
                     MissionData(MissionType.BANANA, [time(1)], 15),
-                    MissionData(MissionType.TIME, [], 30)
+                    MissionData(MissionType.TIME, [], 10)
                 ]
             ),
             StageData(
@@ -996,7 +1034,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(3)], 40),
-                    MissionData(MissionType.TIME, [], 35)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
         ]
@@ -1016,7 +1054,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(5) & Has("Normal Switches"), time(4) & Has("Normal Switches")]),
                     MissionData(MissionType.BANANA, [time(5) & Has("Normal Switches")], 25),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 55)
                 ]
             ),
             StageData(
@@ -1032,8 +1070,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2), time(1), True_()]),
                     MissionData(MissionType.BANANA, [time(2)], 25),
-                    MissionData(MissionType.TIME, [], 10),
-                    MissionData(MissionType.GREEN, [HasAll("Progressive Time Increase", "Normal Switches")])
+                    MissionData(MissionType.TIME, [], 15)
                 ]
             ),
             StageData(
@@ -1041,8 +1078,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2), time(1)]),
                     MissionData(MissionType.BANANA, [time(2)], 20),
-                    MissionData(MissionType.TIME, [], 10),
-                    MissionData(MissionType.NONSTOP, [])
+                    MissionData(MissionType.TIME, [], 30)
                 ]
             ),
             StageData(
@@ -1050,7 +1086,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(5), time(4)]),
                     MissionData(MissionType.BANANA, [time(5)], 20),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 59)
                 ]
             ),
             StageData(
@@ -1058,7 +1094,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(4), time(3)]),
                     MissionData(MissionType.BANANA, [time(4)], 10),
-                    MissionData(MissionType.TIME, [], 10)
+                    MissionData(MissionType.TIME, [], 45)
                 ]
             ),
             StageData(
@@ -1066,7 +1102,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(1)]),
                     MissionData(MissionType.BANANA, [time(3)], 10),
-                    MissionData(MissionType.TIME, [], 30)
+                    MissionData(MissionType.TIME, [], 20)
                 ]
             ),
             StageData(
@@ -1074,7 +1110,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(5) & Has("Normal Switches"), time(4) & Has("Normal Switches")]),
                     MissionData(MissionType.BANANA, [time(5) & Has("Normal Switches")], 29),
-                    MissionData(MissionType.TIME, [], 15)
+                    MissionData(MissionType.TIME, [], 50)
                 ]
             ),
             StageData(
@@ -1082,7 +1118,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
                 [
                     MissionData(MissionType.CLEAR, [time(2) & Has("Normal Switches")]),
                     MissionData(MissionType.BANANA, [time(2) & Has("Normal Switches")], 25),
-                    MissionData(MissionType.TIME, [], 35)
+                    MissionData(MissionType.TIME, [], 25)
                 ]
             ),
         ],
@@ -1511,4 +1547,61 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
             ),
         ]
     ),
+}
+
+CATEGORY_DATA_DICT: dict[str, CategoryData] = {
+    "Deluxe Mode":
+        CategoryData(
+            10000, "Deluxe Mode",
+            HasAny("Deluxe Beginner Stages Pack", "Deluxe Advanced Stages Pack", "Deluxe EX Stages Pack", options=[OptionFilter(DeluxeUnlockStyle, DeluxeUnlockStyle.option_packs)]) \
+            | Has("Deluxe Mode", options=[OptionFilter(DeluxeUnlockStyle, DeluxeUnlockStyle.option_all)]),
+            
+            sum([
+                MISSION_DATA_DICT["Deluxe Beginner Pack"].stage_data, 
+                MISSION_DATA_DICT["Deluxe Advanced Pack"].stage_data, 
+                MISSION_DATA_DICT["Deluxe EX Pack"].stage_data
+            ], []),
+            
+            [
+                MissionData(MissionType.CLEAR, [], 1, category_mission=True),
+                MissionData(MissionType.TURNING_POINT, [], 23, category_mission=True),
+                MissionData(MissionType.STAGE_COMPLETE, [], 46, category_mission=True)
+            ]
+        ),
+    "Reverse Mode":
+        CategoryData(
+            11000, "Reverse Mode", Has("Reverse Mode"), MISSION_DATA_DICT["Reverse Mode"].stage_data,
+            [
+                MissionData(MissionType.CLEAR, [], 1, category_mission=True),
+                MissionData(MissionType.TURNING_POINT, [], 5, category_mission=True),
+                MissionData(MissionType.STAGE_COMPLETE, [], 10, category_mission=True)
+            ]
+        ),
+    "Dark Banana Mode":
+        CategoryData(
+            12000, "Dark Banana Mode", Has("Dark Banana Mode"), MISSION_DATA_DICT["Dark Banana Mode"].stage_data,
+            [
+                MissionData(MissionType.CLEAR, [], 1, category_mission=True),
+                MissionData(MissionType.TURNING_POINT, [], 5, category_mission=True),
+                MissionData(MissionType.STAGE_COMPLETE, [], 10, category_mission=True)
+            ]
+        ),
+    "Golden Banana Mode":
+        CategoryData(
+            13000, "Golden Banana Mode", Has("Golden Banana Mode"), MISSION_DATA_DICT["Golden Banana Mode"].stage_data,
+            [
+                MissionData(MissionType.CLEAR, [], 1, category_mission=True),
+                MissionData(MissionType.TURNING_POINT, [], 5, category_mission=True),
+                MissionData(MissionType.STAGE_COMPLETE, [], 10, category_mission=True)
+            ]
+        ),
+    "Original Stages Mode":
+        CategoryData(
+            14000, "Original Stages Mode", Has("Original Stages Mode"), MISSION_DATA_DICT["Original Stages Mode"].stage_data,
+            [
+                MissionData(MissionType.CLEAR, [], 1, category_mission=True),
+                MissionData(MissionType.TURNING_POINT, [], 12, category_mission=True),
+                MissionData(MissionType.STAGE_COMPLETE, [], 23, category_mission=True)
+            ]
+        )
 }

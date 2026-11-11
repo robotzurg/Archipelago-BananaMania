@@ -1,13 +1,11 @@
 from collections.abc import Mapping
 from typing import Any
 
+from rule_builder.rules import Has, Rule
 from worlds.AutoWorld import World
 
-from . import items, locations, regions, rules, web_world
+from . import items, locations, regions, web_world
 from . import options as smb_options  
-
-# NOTICE: This class, game, web, options/options_dataclass, location_name_to_id, item_name_to_id, origin_region_name, and ut_can_gen_without_yaml
-# are human written and required.
 
 class BananaManiaWorld(World):
     """
@@ -30,15 +28,6 @@ class BananaManiaWorld(World):
     ut_can_gen_without_yaml = True
 
     def generate_early(self) -> None:
-
-        # # NOTICE: I had the basic idea for this and wrote out the initial, but I had AI make it a little cleaner for me. This 
-        # # just basically takes the amount of options we have enabled, and ensures that our goal challenge modes option doesn't
-        # # exceed the amount we have available. Easy to rewrite.
-        # enabled = sum(bool(getattr(self.options, f"smb{g}_{d}"))
-        #             for g in (1, 2) for d in ("casual", "normal", "expert", "master"))
-        # self.options.goal_challenge_modes.value = min(enabled, self.options.goal_challenge_modes.value)
-
-        # NOTICE: This is just the basic template for easy UT access, copy pasted from the UT docs.
         passthrough = getattr(self.multiworld, "re_gen_passthrough", {})
         if self.game in passthrough:
             for key, value in passthrough[self.game].items():
@@ -48,9 +37,6 @@ class BananaManiaWorld(World):
     def create_regions(self) -> None:
         regions.create_and_connect_regions(self)
         locations.create_all_locations(self)
-
-    def set_rules(self) -> None:
-        rules.set_all_rules(self)
 
     def create_items(self) -> None:
         items.create_all_items(self)
@@ -73,4 +59,3 @@ class BananaManiaWorld(World):
     @staticmethod
     def interpret_slot_data(slot_data: dict[str, Any]) -> dict[str, Any]:
         return slot_data
-
