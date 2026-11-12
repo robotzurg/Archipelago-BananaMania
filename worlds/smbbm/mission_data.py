@@ -1,3 +1,5 @@
+from numpy import diff
+
 from rule_builder.rules import Has, True_, Rule, HasAll, HasAny, OptionFilter, AtLeast, And, Or
 from .options import WorldStructure, DeluxeUnlockStyle
 from math import ceil
@@ -109,7 +111,7 @@ class StageData:
         return mission_list
         
 class RegionData:
-    def __init__(self, name: str, req_items: Rule, stage_data: list[StageData]):
+    def __init__(self, name: str, req_items: Rule, challenge_region: bool, stage_data: list[StageData]):
         self.name = name
         self.req_items = req_items
         self.stage_data = stage_data
@@ -124,6 +126,15 @@ class RegionData:
             loc_list.extend(mission_loc_list)
             
         return loc_list
+    
+    def add_challenge_clear_rules(self, difficulty: Difficulty) -> None:
+        prev_stage = None
+        for stage in self.stage_data:
+            if prev_stage == None:
+                prev_stage = stage
+                continue
+            else:
+                stage.missions[0].add_req_items_rules(stage.missions[0].get_mission_item_req(difficulty) 
     
     def get_full_stage_clear_rule(self, difficulty: Difficulty) -> Rule:
         stage_rules = []
@@ -1547,12 +1558,108 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
             ),
         ]
     ),
+    "SMB1 Casual": 
+        RegionData(name="SMB1 Casual", req_items=Has("SMB1 Casual Challenge Mode"), challenge_region=True stage_data=[
+            StageData(
+                9010, "Plain", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                9020, "Diamond", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                9030, "Hairpin", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                9040, "Wide Bridge", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                9050, "Bonus Basic (Casual)", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(4)])]
+            ),
+            StageData(
+                9060, "Slopes", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(5)])]
+            ),
+            StageData(
+                9070, "Steps", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(4)])]
+            ),
+            StageData(
+                9090, "Blocks", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(4)])]
+            ),
+            StageData(
+                9090, "Jump Single", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                9100, "Exam-A", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                9110, "Blur Bridge (Casual)", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(4)])]
+            ),
+            StageData(
+                9120, "Hitter", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(1) & Has("Fast Switches")])]
+            ),
+            StageData(
+                9130, "Banana Plate (Casual)", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                9140, "Cylinders", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                9150, "Notch", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                9160, "Long Torus", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                9170, "Clock Face", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                9180, "Wave Master", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                9190, "Stamina Master", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                9200, "Dance Master", "Original Stages Mode",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                9210, "Dodge Master", "Original Stages Mode",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                9220, "Bridge Master", "Original Stages Mode",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                9230, "Synchronized", "Original Stages Mode",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+        ]
+    ),
 }
 
 CATEGORY_DATA_DICT: dict[str, CategoryData] = {
     "Deluxe Mode":
         CategoryData(
-            10000, "Deluxe Mode",
+            100000, "Deluxe Mode",
             HasAny("Deluxe Beginner Stages Pack", "Deluxe Advanced Stages Pack", "Deluxe EX Stages Pack", options=[OptionFilter(DeluxeUnlockStyle, DeluxeUnlockStyle.option_packs)]) \
             | Has("Deluxe Mode", options=[OptionFilter(DeluxeUnlockStyle, DeluxeUnlockStyle.option_all)]),
             
@@ -1570,7 +1677,7 @@ CATEGORY_DATA_DICT: dict[str, CategoryData] = {
         ),
     "Reverse Mode":
         CategoryData(
-            11000, "Reverse Mode", Has("Reverse Mode"), MISSION_DATA_DICT["Reverse Mode"].stage_data,
+            110000, "Reverse Mode", Has("Reverse Mode"), MISSION_DATA_DICT["Reverse Mode"].stage_data,
             [
                 MissionData(MissionType.CLEAR, [], 1, category_mission=True),
                 MissionData(MissionType.TURNING_POINT, [], 5, category_mission=True),
@@ -1579,7 +1686,7 @@ CATEGORY_DATA_DICT: dict[str, CategoryData] = {
         ),
     "Dark Banana Mode":
         CategoryData(
-            12000, "Dark Banana Mode", Has("Dark Banana Mode"), MISSION_DATA_DICT["Dark Banana Mode"].stage_data,
+            120000, "Dark Banana Mode", Has("Dark Banana Mode"), MISSION_DATA_DICT["Dark Banana Mode"].stage_data,
             [
                 MissionData(MissionType.CLEAR, [], 1, category_mission=True),
                 MissionData(MissionType.TURNING_POINT, [], 5, category_mission=True),
@@ -1588,7 +1695,7 @@ CATEGORY_DATA_DICT: dict[str, CategoryData] = {
         ),
     "Golden Banana Mode":
         CategoryData(
-            13000, "Golden Banana Mode", Has("Golden Banana Mode"), MISSION_DATA_DICT["Golden Banana Mode"].stage_data,
+            130000, "Golden Banana Mode", Has("Golden Banana Mode"), MISSION_DATA_DICT["Golden Banana Mode"].stage_data,
             [
                 MissionData(MissionType.CLEAR, [], 1, category_mission=True),
                 MissionData(MissionType.TURNING_POINT, [], 5, category_mission=True),
@@ -1597,7 +1704,7 @@ CATEGORY_DATA_DICT: dict[str, CategoryData] = {
         ),
     "Original Stages Mode":
         CategoryData(
-            14000, "Original Stages Mode", Has("Original Stages Mode"), MISSION_DATA_DICT["Original Stages Mode"].stage_data,
+            140000, "Original Stages Mode", Has("Original Stages Mode"), MISSION_DATA_DICT["Original Stages Mode"].stage_data,
             [
                 MissionData(MissionType.CLEAR, [], 1, category_mission=True),
                 MissionData(MissionType.TURNING_POINT, [], 12, category_mission=True),

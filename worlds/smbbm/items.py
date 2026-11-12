@@ -140,23 +140,23 @@ def create_all_items(world: BananaManiaWorld) -> None:
     else:  # worlds
         itempool += [world.create_item(name) for name in SMB2_WORLD_UNLOCKS]
 
-    # if world.options.smb1_casual == 1:
-    #     itempool.append(world.create_item(f"SMB1 Casual Challenge Mode"))
-    # if world.options.smb1_normal == 1:
-    #     itempool.append(world.create_item(f"SMB1 Normal Challenge Mode"))
-    # if world.options.smb1_expert == 1:
-    #     itempool.append(world.create_item(f"SMB1 Expert Challenge Mode"))
-    # if world.options.smb1_master == 1:
-    #     itempool.append(world.create_item(f"SMB1 Master Challenge Mode"))
+    if world.options.smb1_casual == 1:
+        itempool.append(world.create_item(f"SMB1 Casual Challenge Mode"))
+    if world.options.smb1_normal == 1:
+        itempool.append(world.create_item(f"SMB1 Normal Challenge Mode"))
+    if world.options.smb1_expert == 1:
+        itempool.append(world.create_item(f"SMB1 Expert Challenge Mode"))
+    if world.options.smb1_master == 1:
+        itempool.append(world.create_item(f"SMB1 Master Challenge Mode"))
         
-    # if world.options.smb1_normal == 1:
-    #     itempool.append(world.create_item(f"SMB2 Casual Challenge Mode"))
-    # if world.options.smb1_normal == 1:
-    #     itempool.append(world.create_item(f"SMB2 Normal Challenge Mode"))
-    # if world.options.smb1_normal == 1:
-    #     itempool.append(world.create_item(f"SMB2 Expert Challenge Mode"))
-    # if world.options.smb1_normal == 1:
-    #     itempool.append(world.create_item(f"SMB2 Master Challenge Mode"))
+    if world.options.smb1_normal == 1:
+        itempool.append(world.create_item(f"SMB2 Casual Challenge Mode"))
+    if world.options.smb1_normal == 1:
+        itempool.append(world.create_item(f"SMB2 Normal Challenge Mode"))
+    if world.options.smb1_normal == 1:
+        itempool.append(world.create_item(f"SMB2 Expert Challenge Mode"))
+    if world.options.smb1_normal == 1:
+        itempool.append(world.create_item(f"SMB2 Master Challenge Mode"))
 
     if world.options.reverse_mode == 1:
         itempool.append(world.create_item(f"Reverse Mode"))
