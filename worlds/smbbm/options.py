@@ -86,14 +86,14 @@ class LogicDifficulty(Choice):
 
     default = option_standard
     
-class Smb1CasualChallengeMode(DefaultOnToggle):
+class Smb1CasualChallengeMode(Toggle):
     """
     Include SMB1 Casual difficulty challenge mode in logic.
     """
     
     display_name = "SMB1 Casual Challenge Mode Stages"
     
-class Smb1NormalChallengeMode(DefaultOnToggle):
+class Smb1NormalChallengeMode(Toggle):
     """
     Include SMB1 Normal difficulty challenge mode in logic.
     """
@@ -224,20 +224,20 @@ option_groups = [
         [GoalWorlds, GoalChallengeModes],
     ),
     OptionGroup(
+        "Location Options",
+        [WorldStructure, LogicDifficulty],
+    ),
+    OptionGroup(
         "Mission Options",
         [IncludeBananaMissions, IncludeTimeMissions, IncludeExtraGoals, IncludeNonstopMissions],
+    ),
+    OptionGroup(
+        "Special Mode Options",
+        [DeluxeStages, DeluxeUnlockStyle, ReverseModeStages, DarkBananaStages, GoldenBananaStages, OriginalStagesMode]
     ),
     OptionGroup(
         "Challenge Mode Options",
         [Smb1CasualChallengeMode, Smb1NormalChallengeMode, Smb1ExpertChallengeMode, Smb1MasterChallengeMode,
          Smb2CasualExChallengeMode, Smb2NormalExChallengeMode, Smb2ExpertExChallengeMode, Smb2MasterExChallengeMode]
-    ),
-    OptionGroup(
-        "Special Mode Options",
-        [ReverseModeStages, DarkBananaStages, GoldenBananaStages, OriginalStagesMode]
-    ),
-    OptionGroup(
-        "Extra Options",
-        [WorldStructure, DeluxeUnlockStyle, LogicDifficulty],
     ),
 ]

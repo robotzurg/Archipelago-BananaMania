@@ -7,6 +7,9 @@ from BaseClasses import Item, ItemClassification
 if TYPE_CHECKING:
     from .world import BananaManiaWorld
 
+# TODO: MAKE FILLER ITEMS AND ALSO MAKE THE TIME THINGS USEFUL
+# MAKE THEM CONFIGURABLE IN TERMS OF WEIGHT AND AMOUNT
+
 ITEM_NAME_TO_ID = {
     "Progressive World Unlock": 1,
     "World 2: Volcanic Magma": 2,
@@ -123,7 +126,7 @@ class BananaManiaItem(Item):
 def get_random_filler_item_name(world: BananaManiaWorld) -> str:
     return world.random.choices(
         ["+10 Time Bonus", "+20 Time Bonus", "+30 Time Bonus"],
-        weights=[6, 3, 1],
+        weights=[8, 1.5, 0.5],
     )[0]
 
 def create_item_with_correct_classification(world: BananaManiaWorld, name: str) -> BananaManiaItem:
@@ -149,13 +152,13 @@ def create_all_items(world: BananaManiaWorld) -> None:
     if world.options.smb1_master == 1:
         itempool.append(world.create_item(f"SMB1 Master Challenge Mode"))
         
-    if world.options.smb1_normal == 1:
+    if world.options.smb2_casual == 1:
         itempool.append(world.create_item(f"SMB2 Casual Challenge Mode"))
-    if world.options.smb1_normal == 1:
+    if world.options.smb2_normal == 1:
         itempool.append(world.create_item(f"SMB2 Normal Challenge Mode"))
-    if world.options.smb1_normal == 1:
+    if world.options.smb2_expert == 1:
         itempool.append(world.create_item(f"SMB2 Expert Challenge Mode"))
-    if world.options.smb1_normal == 1:
+    if world.options.smb2_master == 1:
         itempool.append(world.create_item(f"SMB2 Master Challenge Mode"))
 
     if world.options.reverse_mode == 1:

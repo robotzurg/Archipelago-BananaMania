@@ -27,7 +27,21 @@ class BananaManiaWorld(World):
 
     ut_can_gen_without_yaml = True
 
+    def custom_ut_sort(self, region_label: str, location_label: str) -> str | int:
+        sorting_key: str | int = self.location_name_to_id[location_label]
+        return sorting_key
+
     def generate_early(self) -> None:
+
+        challenges_enabled = 0
+        for opt in [self.options.smb1_casual, self.options.smb1_normal, self.options.smb1_expert, self.options.smb1_master,
+                    self.options.smb2_casual, self.options.smb2_normal, self.options.smb2_expert, self.options.smb2_master]:
+            if opt:
+                challenges_enabled += 1
+
+        if challenges_enabled < self.options.goal_challenge_modes.value:
+            self.options.goal_challenge_modes.value = challenges_enabled
+
         passthrough = getattr(self.multiworld, "re_gen_passthrough", {})
         if self.game in passthrough:
             for key, value in passthrough[self.game].items():

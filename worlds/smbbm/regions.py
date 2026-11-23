@@ -36,6 +36,29 @@ WORLD_REGIONS = [
     "Original Stages Mode"
 ]
 
+SMB2_WORLD_REGIONS = [
+    "World 1",
+    "World 2",
+    "World 3",
+    "World 4",
+    "World 5",
+    "World 6",
+    "World 7",
+    "World 8",
+    "World 9",
+    "World 10",
+]
+
+CHALLENGE_REGIONS = [
+    "SMB1 Casual",
+    "SMB1 Normal",
+    "SMB1 Expert",
+    "SMB1 Master",
+    "SMB2 Casual",
+    "SMB2 Normal",
+    "SMB2 Expert",
+    "SMB2 Master",
+]
 
 def create_and_connect_regions(world: BananaManiaWorld) -> None:
     create_all_regions(world)

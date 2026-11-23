@@ -5,9 +5,9 @@ from typing import TYPE_CHECKING
 
 from BaseClasses import Location
 from . import items
-from .regions import WORLD_REGIONS
-from .mission_data import MISSION_DATA_DICT, CATEGORY_DATA_DICT, MissionType
-from rule_builder.rules import HasAny, Or, OptionFilter, Has, Rule, AtLeast
+from .regions import WORLD_REGIONS, SMB2_WORLD_REGIONS, CHALLENGE_REGIONS
+from .mission_data import MISSION_DATA_DICT, CATEGORY_DATA_DICT, MissionType, StageData
+from rule_builder.rules import CanReachLocation, HasAny, Or, OptionFilter, Has, Rule, AtLeast
 from .options import DeluxeUnlockStyle
 
 if TYPE_CHECKING:
@@ -34,6 +34,26 @@ def get_location_names_with_ids() -> dict[str, int | None]:
 
 def get_disabled_regions(world: BananaManiaWorld) -> list[str]:
     disabled_regions = []
+    # Challenge Modes
+    if world.options.smb1_casual == 0:
+        disabled_regions.append("SMB1 Casual")
+    if world.options.smb1_normal == 0:
+        disabled_regions.append("SMB1 Normal")
+    if world.options.smb1_expert == 0:
+        disabled_regions.append("SMB1 Expert")
+    if world.options.smb1_master == 0:
+        disabled_regions.append("SMB1 Master")
+
+    if world.options.smb2_casual == 0:
+        disabled_regions.append("SMB2 Casual")
+    if world.options.smb2_normal == 0:
+        disabled_regions.append("SMB2 Normal")
+    if world.options.smb2_expert == 0:
+        disabled_regions.append("SMB2 Expert")
+    if world.options.smb2_master == 0:
+        disabled_regions.append("SMB2 Master")
+    
+    # Other Modes
     if world.options.reverse_mode == 0:
         disabled_regions.append("Reverse Mode")
     if world.options.dark_banana_mode == 0:
@@ -75,10 +95,11 @@ def create_regular_locations(world: BananaManiaWorld) -> None:
     for region in WORLD_REGIONS:
         if region in disabled_regions:
             continue
-        
+
         if region != "Deluxe Mode":
             region_data = MISSION_DATA_DICT[region] 
             world_region = world.get_region(region)
+            prev_stage: StageData = None
         
             if len(region_data) != 0:
                 region_entrance = world.get_entrance(f"Menu to {region}")
@@ -93,7 +114,12 @@ def create_regular_locations(world: BananaManiaWorld) -> None:
                         
                         world_region.add_locations({loc_name: loc_id}, BananaManiaLocation)
                         loc = world.get_location(loc_name)
-                        world.set_rule(loc, mission.get_mission_item_req(world.options.logic_difficulty))
+                        if prev_stage == None or not stage.region in CHALLENGE_REGIONS:
+                            world.set_rule(loc, mission.get_mission_item_req(world.options.logic_difficulty))
+                        else:
+                            world.set_rule(loc, mission.get_mission_item_req(world.options.logic_difficulty) & CanReachLocation(prev_stage.get_named_mission_location(idx)))
+
+                    prev_stage = stage
             
         if region == "Deluxe Mode":
             world_region = world.get_region(region)
@@ -108,18 +134,24 @@ def create_regular_locations(world: BananaManiaWorld) -> None:
                 
                 world_region.add_locations({loc_name: loc_id}, BananaManiaLocation)
                 loc = world.get_location(loc_name)
-                world.set_rule(loc, category_data.get_stage_win_rule(mission.amount, world.options.logic_difficulty))
-    
+                if category_data.challenge:
+                    world.set_rule(loc, category_data.get_stage_win_rule(len(category_data.stage_data), world.options.logic_difficulty))
+                else:
+                    world.set_rule(loc, category_data.get_stage_win_rule(mission.amount, world.options.logic_difficulty))
 
 def create_events(world: BananaManiaWorld) -> None:
     menu = world.get_region("Menu")
     smb2_world_complete_rules: list[Rule] = []
-    for world_region in WORLD_REGIONS[0:10]:
+    challenge_mode_complete_rules: list[Rule] = []
+    for world_region in SMB2_WORLD_REGIONS:
         smb2_world_complete_rules.append(MISSION_DATA_DICT[world_region].get_full_stage_clear_rule(world.options.logic_difficulty))
+
+    for challenge_region in CHALLENGE_REGIONS:
+        challenge_mode_complete_rules.append(CATEGORY_DATA_DICT[challenge_region].get_stage_win_rule(len(MISSION_DATA_DICT[challenge_region].stage_data), world.options.logic_difficulty))
 
     menu.add_event(
         "Goal", "Victory", location_type=BananaManiaLocation, item_type=items.BananaManiaItem,
-        rule=AtLeast(world.options.goal_worlds.value, *smb2_world_complete_rules)
+        rule=AtLeast(world.options.goal_worlds.value, *smb2_world_complete_rules) & AtLeast(world.options.goal_challenge_modes.value, *challenge_mode_complete_rules)
     )
     
     world.set_completion_rule(Has("Victory"))

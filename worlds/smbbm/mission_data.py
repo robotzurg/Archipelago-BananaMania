@@ -1,6 +1,6 @@
 from numpy import diff
 
-from rule_builder.rules import Has, True_, Rule, HasAll, HasAny, OptionFilter, AtLeast, And, Or
+from rule_builder.rules import CanReachLocation, Has, True_, Rule, HasAll, HasAny, OptionFilter, AtLeast, And, Or
 from .options import WorldStructure, DeluxeUnlockStyle
 from math import ceil
 from enum import IntEnum
@@ -23,7 +23,7 @@ class MissionType(IntEnum):
     STAGE_COMPLETE = 10,
 
 class MissionData():
-    def __init__(self, mission_type: MissionType, req_items: list[Rule], amount: int | str | None = None, add_clear_reqs: bool = False, category_mission: bool = False):
+    def __init__(self, mission_type: MissionType, req_items: list[Rule], amount: int | str | None = None, add_clear_reqs: bool = False, category_mission: bool = False, challenge_category_mission: bool = False):
         self.mission_type = mission_type
         self.req_items = self.fill_in_req_items(req_items)
         self.amount = amount
@@ -33,9 +33,10 @@ class MissionData():
             self.add_clear_reqs = True
         
         # Has unique item rules assigned later
-        self.category_mission = category_mission 
+        self.category_mission = category_mission
+        self.challenge_category_mission = challenge_category_mission
 
-    def add_req_items_rules(self, req_items):
+    def add_req_items_rules(self, req_items: list[Rule]):
         for idx, rule in enumerate(req_items):
             self.req_items[idx] = rule & self.req_items[idx] 
     
@@ -111,10 +112,11 @@ class StageData:
         return mission_list
         
 class RegionData:
-    def __init__(self, name: str, req_items: Rule, challenge_region: bool, stage_data: list[StageData]):
+    def __init__(self, name: str, req_items: Rule, stage_data: list[StageData], challenge_region: bool = False):
         self.name = name
         self.req_items = req_items
         self.stage_data = stage_data
+        self.challenge_region = challenge_region
         
     def __len__(self):
         return len(self.stage_data)
@@ -127,15 +129,6 @@ class RegionData:
             
         return loc_list
     
-    def add_challenge_clear_rules(self, difficulty: Difficulty) -> None:
-        prev_stage = None
-        for stage in self.stage_data:
-            if prev_stage == None:
-                prev_stage = stage
-                continue
-            else:
-                stage.missions[0].add_req_items_rules(stage.missions[0].get_mission_item_req(difficulty) 
-    
     def get_full_stage_clear_rule(self, difficulty: Difficulty) -> Rule:
         stage_rules = []
         for stage in self.stage_data:
@@ -146,12 +139,13 @@ class RegionData:
         return And(*stage_rules)
 
 class CategoryData:
-    def __init__(self, base_id: int, name: str, req_items: Rule, stage_data: list[StageData], missions: list[MissionData]):
+    def __init__(self, base_id: int, name: str, req_items: Rule, stage_data: list[StageData], missions: list[MissionData], challenge: bool = False):
         self.base_id = base_id
         self.name = name
         self.req_items = req_items
         self.stage_data = stage_data
         self.missions = missions
+        self.challenge = challenge
         
     def __len__(self):
             return len(self.stage_data)
@@ -177,7 +171,6 @@ class CategoryData:
             stage_rules.append((stage.missions[0].get_mission_item_req(difficulty)))
             
         return AtLeast(amount, *stage_rules)
-             
     
 # Returns a rule with the amount of time a level needs, to prevent a lot of annoying copypasting lol
 def time(amount: int) -> Rule:
@@ -858,8 +851,8 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
             StageData(
                 700, "Quick Turn", "World 7",
                 [
-                    MissionData(MissionType.CLEAR, [Has("Fast Switches")]),
-                    MissionData(MissionType.BANANA, [Has("Fast Switches") | time(1)], "Complete"),
+                    MissionData(MissionType.CLEAR, []),
+                    MissionData(MissionType.BANANA, [time(1)], "Complete"),
                     MissionData(MissionType.TIME, [], 10),
                     MissionData(MissionType.NONSTOP, [])
                 ]
@@ -1559,7 +1552,7 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
         ]
     ),
     "SMB1 Casual": 
-        RegionData(name="SMB1 Casual", req_items=Has("SMB1 Casual Challenge Mode"), challenge_region=True stage_data=[
+        RegionData(name="SMB1 Casual", req_items=Has("SMB1 Casual Challenge Mode"), challenge_region=True, stage_data=[
             StageData(
                 9010, "Plain", "SMB1 Casual",
                 [MissionData(MissionType.CLEAR, [])]
@@ -1570,27 +1563,27 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
             ),
             StageData(
                 9030, "Hairpin", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(1)])]
+                [MissionData(MissionType.CLEAR, [])]
             ),
             StageData(
                 9040, "Wide Bridge", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(1)])]
+                [MissionData(MissionType.CLEAR, [])]
             ),
             StageData(
                 9050, "Bonus Basic (Casual)", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(4)])]
+                [MissionData(MissionType.CLEAR, [])]
             ),
             StageData(
                 9060, "Slopes", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(5)])]
+                [MissionData(MissionType.CLEAR, [])]
             ),
             StageData(
                 9070, "Steps", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(4)])]
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
             ),
             StageData(
-                9090, "Blocks", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(4)])]
+                9080, "Blocks", "SMB1 Casual",
+                [MissionData(MissionType.CLEAR, [time(1)])]
             ),
             StageData(
                 9090, "Jump Single", "SMB1 Casual",
@@ -1598,59 +1591,1015 @@ MISSION_DATA_DICT: dict[str, RegionData] = {
             ),
             StageData(
                 9100, "Exam-A", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(2)])]
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
             ),
             StageData(
                 9110, "Blur Bridge (Casual)", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(4)])]
+                [MissionData(MissionType.CLEAR, [])]
             ),
             StageData(
                 9120, "Hitter", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(1) & Has("Fast Switches")])]
+                [MissionData(MissionType.CLEAR, [])]
             ),
             StageData(
                 9130, "Banana Plate (Casual)", "SMB1 Casual",
                 [MissionData(MissionType.CLEAR, [])]
             ),
+        ]
+    ),
+    "SMB1 Normal": 
+        RegionData(name="SMB1 Normal", req_items=Has("SMB1 Normal Challenge Mode"), challenge_region=True, stage_data=[
             StageData(
-                9140, "Cylinders", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(1)])]
-            ),
-            StageData(
-                9150, "Notch", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(1)])]
-            ),
-            StageData(
-                9160, "Long Torus", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(2)])]
-            ),
-            StageData(
-                9170, "Clock Face", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(2)])]
-            ),
-            StageData(
-                9180, "Wave Master", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(2)])]
-            ),
-            StageData(
-                9190, "Stamina Master", "SMB1 Casual",
-                [MissionData(MissionType.CLEAR, [time(1)])]
-            ),
-            StageData(
-                9200, "Dance Master", "Original Stages Mode",
+                10010, "Bump", "SMB1 Normal",
                 [MissionData(MissionType.CLEAR, [])]
             ),
             StageData(
-                9210, "Dodge Master", "Original Stages Mode",
+                10020, "Walking", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                10030, "Repulse", "SMB1 Normal",
                 [MissionData(MissionType.CLEAR, [])]
             ),
             StageData(
-                9220, "Bridge Master", "Original Stages Mode",
+                10040, "Narrow Bridge", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                10050, "Bonus Basic (Normal)", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10060, "Break", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10070, "Curves", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                10080, "Downhill", "SMB1 Normal",
                 [MissionData(MissionType.CLEAR, [time(1)])]
             ),
             StageData(
-                9230, "Synchronized", "Original Stages Mode",
+                10090, "Blocks Slim", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                10100, "Bonus Wave (Normal)", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                10110, "Choice", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                10120, "Bowl", "SMB1 Normal",
                 [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10130, "Jumpies", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10140, "Stoppers", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                10150, "Floor Bent", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                10160, "Conveyers", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10170, "Exam-B", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                10180, "Chaser", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                10190, "Jump Double", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10200, "Bonus Grid (Normal)", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10210, "Middle Jam", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                10220, "Ant Lion", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10230, "Collapse", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                10240, "Swing Bar", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10250, "Labyrinth", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(2), True_()])]
+            ),
+            StageData(
+                10260, "Spiral", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(2), True_()])]
+            ),
+            StageData(
+                10270, "Wavy Jump", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10280, "Spiky", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                10290, "Unrest", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10300, "Polar", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10310, "Blur Bridge (Normal)", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10320, "Hard Hitter (Normal)", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10330, "Puzzle", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(3), time(1), True_()])]
+            ),
+            StageData(
+                10340, "Banana Plate (Normal)", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                10350, "Polar Large", "SMB1 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+        ]
+    ),
+    "SMB1 Expert": 
+        RegionData(name="SMB1 Expert", req_items=Has("SMB1 Expert Challenge Mode"), challenge_region=True, stage_data=[
+            StageData(
+                11010, "Ruin", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11020, "Branch", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11030, "Overturn", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11040, "Excursion", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(4), True_()])]
+            ),
+            StageData(
+                11050, "Bonus Basic (Expert)", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11060, "Dodecagon", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                11070, "Exam-C", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(5), time(4), time(3)])]
+            ),
+            StageData(
+                11080, "Skeleton", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                11090, "Tracks", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), time(1)])]
+            ),
+            StageData(
+                11100, "Bonus Wave (Expert)", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11110, "Downhill Hard", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), time(1)])]
+            ),
+            StageData(
+                11120, "Gears", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(3), time(2), time(1)])]
+            ),
+            StageData(
+                11130, "Destruction", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), True_()])]
+            ),
+            StageData(
+                11140, "Invasion", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(3), time(2), time(1)])]
+            ),
+            StageData(
+                11150, "Diving", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11160, "Floor Slant", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11170, "Tram", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                11180, "Swing Bar Long", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11190, "Paper Work", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                11200, "Bonus Grid (Expert)", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11210, "Twin Attacker", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11220, "Sega Logo", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), time(1)])]
+            ),
+            StageData(
+                11230, "Snake", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11240, "Wind", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(4), time(3)])]
+            ),
+            StageData(
+                11250, "Sliders", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                11260, "Fall Down", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11270, "Twin Cross", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), True_()])]
+            ),
+            StageData(
+                11280, "Spiral Hard", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(3), True_()])]
+            ),
+            StageData(
+                11290, "Conveyor Hard", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                11300, "Bonus Bumpy", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11310, "Gaps", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11320, "Curvature", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(4), time(3), time(2)])]
+            ),
+            StageData(
+                11330, "Ant Lion Super", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11340, "Drum", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11350, "Twister", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11360, "Speedy Jam", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                11370, "Quake", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11380, "Cassiopeia", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                11390, "Pirates", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11400, "Bonus Hunting", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11410, "Bowl Open", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11420, "Checker", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11430, "Carpet", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), time(1)])]
+            ),
+            StageData(
+                11440, "Ridge", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                11450, "Mixer", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                11460, "Rings", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                11470, "Stairs", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11480, "Clover", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), time(1)])]
+            ),
+            StageData(
+                11490, "Coffee Cup", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11500, "Metamorphosis", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11510, "Blur Bridge (Expert)", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11520, "Breathe", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11530, "Hard Hitter (Expert)", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11540, "Ferris Wheel", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11550, "Factory", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                11560, "Curl Pipe", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11570, "Magic Hand", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), True_()])]
+            ),
+            StageData(
+                11580, "Banana Plate (Expert)", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                11590, "Sanctuary", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                11600, "Daa Loo Maa", "SMB1 Expert",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+        ]
+    ),
+    "SMB1 Master": 
+        RegionData(name="SMB1 Master", req_items=Has("SMB1 Master Challenge Mode"), challenge_region=True, stage_data=[
+            StageData(
+                12010, "Wave Master", "SMB1 Master",
+                [MissionData(MissionType.CLEAR, [time(2), time(2), time(1)])]
+            ),
+            StageData(
+                12020, "Fan Master", "SMB1 Master",
+                [MissionData(MissionType.CLEAR, [time(2), time(1), True_()])]
+            ),
+            StageData(
+                12030, "Stamina Master", "SMB1 Master",
+                [MissionData(MissionType.CLEAR, [time(3), time(1)])]
+            ),
+            StageData(
+                12040, "Spring Master", "SMB1 Master",
+                [MissionData(MissionType.CLEAR, [time(4), time(4), time(1)])]
+            ),
+            StageData(
+                12050, "Dance Master", "SMB1 Master",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                12060, "Roll Master", "SMB1 Master",
+                [MissionData(MissionType.CLEAR, [time(2), True_()])]
+            ),
+            StageData(
+                12070, "Edge Master", "SMB1 Master",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                12080, "Dodge Master", "SMB1 Master",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                12090, "Bridge Master", "SMB1 Master",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                12100, "Monkey Master", "SMB1 Master",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+        ]
+    ),
+    "SMB2 Casual": 
+        RegionData(name="SMB2 Casual", req_items=Has("SMB2 Casual Challenge Mode"), challenge_region=True, stage_data=[
+            StageData(
+                13010, "Simple", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                13020, "Hollow", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                13030, "Bumpy", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                13040, "Switches", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                13050, "Rising Inclines", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                13060, "Floaters", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                13070, "Tub", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                13080, "Windy Slide", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [time(3), time(2), time(1)])]
+            ),
+            StageData(
+                13090, "Spinning Top", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                13100, "Curve Bridge", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [time(3)])]
+            ),
+            StageData(
+                13110, "Conveyers", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                13120, "Bumpy Check", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                13130, "Alternative", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [time(2), Or(time(1) & Has("Fast Switches"), time(2))])]
+            ),
+            StageData(
+                13140, "Junction", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                13150, "Bead Screen", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [time(1) & Has("Pause Switches"), True_()])]
+            ),
+            StageData(
+                13160, "Fluctuation", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                13170, "Folders", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                13180, "Quick Turn", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [Has("Fast Switches")])]
+            ),
+            StageData(
+                13190, "Linear Seesaws", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                13200, "Birth", "SMB2 Casual",
+                [MissionData(MissionType.CLEAR, [time(2) & Has("Pause Switches")])]
+            ),
+        ]
+    ),
+    "SMB2 Normal": 
+        RegionData(name="SMB2 Normal", req_items=Has("SMB2 Normal Challenge Mode"), challenge_region=True, stage_data=[
+            StageData(
+                14010, "Banks", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                14020, "Eaten Floor", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                14030, "Hoppers", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                14040, "Coaster", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(2), time(2), time(1)])]
+            ),
+            StageData(
+                14050, "Board Park", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                14060, "Swell", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                14070, "Gravity Slider", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                14080, "Inchworms", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                14090, "Totalitarianism", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                14100, "Leveler", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                14110, "Organic Form", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                14120, "Reversible Gear", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                14130, "Stepping Stones", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                14140, "Dribbles", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(4), time(3)])]
+            ),
+            StageData(
+                14150, "Push Bar", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                14160, "Mad Rings", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                14170, "Curvy Options", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                14180, "Twist & Spin", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                14190, "Cascade", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(2), time(1), True_()])]
+            ),
+            StageData(
+                14200, "Rampage", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                14210, "Pro Skaters", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [Has("Pause Switches"), True_()])]
+            ),
+            StageData(
+                14220, "Giant Comb", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(2), time(1), True_()])]
+            ),
+            StageData(
+                14230, "Beehive", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(2), time(1)])]
+            ),
+            StageData(
+                14240, "Dynamic Maze", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                14250, "Triangle Holes", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                14260, "Launchers", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(2), time(1)])]
+            ),
+            StageData(
+                14270, "Randomizer", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                14280, "Coin Slots", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(2), time(1)])]
+            ),
+            StageData(
+                14290, "Seesaw Bridges", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(4), time(3), time(2)])]
+            ),
+            StageData(
+                14300, "Arthropod", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                14310, "Auto Doors", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                14320, "Heavy Sphere", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [Has("Normal Switches")])]
+            ),
+            StageData(
+                14330, "Stagger", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                14340, "U.F.O.", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1) & Has("Normal Switches")])]
+            ),
+            StageData(
+                14350, "Ring Bridges", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(2), time(1)])]
+            ),
+            StageData(
+                14360, "Domes", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                14370, "Amida Lot", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                14380, "Long Slider", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(3), time(3), True_()])]
+            ),
+            StageData(
+                14390, "Grid Bridge", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                14400, "Teapot", "SMB2 Normal",
+                [MissionData(MissionType.CLEAR, [Has("Normal Switches")])]
+            ),
+        ]
+    ),
+    "SMB2 Expert": 
+        RegionData(name="SMB2 Expert", req_items=Has("SMB2 Expert Challenge Mode"), challenge_region=True, stage_data=[
+            StageData(
+                15010, "Wormhole", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2) & Has("Wormholes"), time(1) & Has("Wormholes")])]
+            ),
+            StageData(
+                15020, "Free Fall", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), time(1), True_()])]
+            ),
+            StageData(
+                15030, "Melting Pot", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                15040, "Mad Shuffle", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [Has("Wormholes")])]
+            ),
+            StageData(
+                15050, "Partition", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                15060, "Jump Machine", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                15070, "Zigzag Slope", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                15080, "Tower", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1) & Has("Wormholes")])]
+            ),
+            StageData(
+                15090, "Toggle", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                15100, "Combination", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2) & HasAll("Wormholes", "Normal Switches"), Has("Wormholes")])]
+            ),
+            StageData(
+                15110, "Punched Seesaws", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                15120, "Opera", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(4), time(3), time(2)])]
+            ),
+            StageData(
+                15130, "Brandished", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                15140, "Tiers", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1) & Has("Wormholes")])]
+            ),
+            StageData(
+                15150, "Cliffs", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), time(1), True_()])]
+            ),
+            StageData(
+                15160, "Narrow Peaks", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                15170, "Detours", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1) & Has("Wormholes"), Has("Wormholes")])]
+            ),
+            StageData(
+                15180, "Switch Inferno", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [Has("Normal Switches")])]
+            ),
+            StageData(
+                15190, "Spiral Bridge", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                15200, "Wavy Option", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                15210, "Obstacle", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                15220, "Domino", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1) & Has("Normal Switches"), Has("Normal Switches"), True_()])]
+            ),
+            StageData(
+                15230, "Sieve", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                15240, "Flock", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(4), time(1), True_()])]
+            ),
+            StageData(
+                15250, "Double Spiral", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                15260, "Hierarchy", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                15270, "8 Bracelets", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                15280, "Pistons", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), time(1)])]
+            ),
+            StageData(
+                15290, "Soft Cream", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1) & Has("Normal Switches"), Or(time(1) & Has("Normal Switches"), Has("Fast Switches")), HasAny("Normal Switches", "Fast Switches")])]
+            ),
+            StageData(
+                15300, "Momentum", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                15310, "Entangled Path", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [Or(time(4) & HasAll("Fast Switches", "Normal Switches"), time(5)), time(3) & HasAll("Fast Switches", "Normal Switches"), time(2)])]
+            ),
+            StageData(
+                15320, "Totters", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                15330, "Vortex", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), time(1)])]
+            ),
+            StageData(
+                15340, "Warp", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                15350, "Trampolines", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), time(1)])]
+            ),
+            StageData(
+                15360, "Swing Shaft", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), time(1)])]
+            ),
+            StageData(
+                15370, "Fighters", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                15380, "Serial Jump", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                15390, "Cross Floors", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                15400, "Spinning Saw", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), True_()])]
+            ),
+            StageData(
+                15410, "Chipped Pipes", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                15420, "Flat Maze", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(5), time(3), time(2)])]
+            ),
+            StageData(
+                15430, "Guillotine", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), time(2), time(1)])]
+            ),
+            StageData(
+                15440, "Cork Screw", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                15450, "Orbiters", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                15460, "Twin Basin", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                15470, "Air Hockey", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                15480, "Charge", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1) & Has("Wormholes")])]
+            ),
+            StageData(
+                15490, "Strata", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                15500, "Square Dance", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                15510, "Giant Swing", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(3)])]
+            ),
+            StageData(
+                15520, "5 Drums", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                15530, "Free Throw", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                15540, "Pendulums", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(3), time(3), True_()])]
+            ),
+            StageData(
+                15550, "Conical Slider", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(3) & Has("Wormholes")])]
+            ),
+            StageData(
+                15560, "Construction", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(3)])]
+            ),
+            StageData(
+                15570, "Train Worm", "SMB2 Expert",
+                [MissionData(MissionType.CLEAR, [time(2), True_()])]
+            ),
+        ]
+    ),
+    "SMB2 Master": 
+        RegionData(name="SMB2 Master", req_items=Has("SMB2 Master Challenge Mode"), challenge_region=True, stage_data=[
+            StageData(
+                16010, "Centrifugal", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [time(2), time(1), True_()])]
+            ),
+            StageData(
+                16020, "Swing Bridges", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                16030, "Cylinders", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                16040, "Passage", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                16050, "Notch", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                16060, "Intermittent", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                16070, "Long Torus", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                16080, "Spasmodic", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                16090, "Double Twin", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                16100, "Clock Face", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                16110, "Variable Width", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                16120, "Striker", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [time(1), True_()])]
+            ),
+            StageData(
+                16130, "Ooparts", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                16140, "Planets", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                16150, "Sliced Cheese", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [time(2)])]
+            ),
+            StageData(
+                16160, "8 Seesaws", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [time(1)])]
+            ),
+            StageData(
+                16170, "Synchronized", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                16180, "Helix", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [time(5)])]
+            ),
+            StageData(
+                16190, "Dizzy Systems", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [])]
+            ),
+            StageData(
+                16200, "Destiny", "SMB2 Master",
+                [MissionData(MissionType.CLEAR, [time(3)])]
             ),
         ]
     ),
@@ -1710,5 +2659,69 @@ CATEGORY_DATA_DICT: dict[str, CategoryData] = {
                 MissionData(MissionType.TURNING_POINT, [], 12, category_mission=True),
                 MissionData(MissionType.STAGE_COMPLETE, [], 23, category_mission=True)
             ]
-        )
+        ),
+    "SMB1 Casual":
+        CategoryData(
+            200000, "SMB1 Casual", Has("SMB1 Casual Challenge Mode"), MISSION_DATA_DICT["SMB1 Casual"].stage_data,
+            [
+                MissionData(MissionType.CHALLENGE_CLEAR,        [], category_mission=True, challenge_category_mission=True),
+                MissionData(MissionType.CHALLENGE_CLEAR_EXTRA,  [], 10, category_mission=True, challenge_category_mission=True),
+            ], challenge=True
+        ),
+    "SMB1 Normal":
+        CategoryData(
+            210000, "SMB1 Normal", Has("SMB1 Normal Challenge Mode"), MISSION_DATA_DICT["SMB1 Normal"].stage_data,
+            [
+                MissionData(MissionType.CHALLENGE_CLEAR,        [], category_mission=True, challenge_category_mission=True),
+                MissionData(MissionType.CHALLENGE_CLEAR_EXTRA,  [], 30, category_mission=True, challenge_category_mission=True),
+            ], challenge=True
+        ),
+    "SMB1 Expert":
+        CategoryData(
+            220000, "SMB1 Expert", Has("SMB1 Expert Challenge Mode"), MISSION_DATA_DICT["SMB1 Expert"].stage_data,
+            [
+                MissionData(MissionType.CHALLENGE_CLEAR,        [], category_mission=True, challenge_category_mission=True),
+                MissionData(MissionType.CHALLENGE_CLEAR_EXTRA,  [], 99, category_mission=True, challenge_category_mission=True),
+            ], challenge=True
+        ),
+    "SMB1 Master":
+        CategoryData(
+            230000, "SMB1 Master", Has("SMB1 Master Challenge Mode"), MISSION_DATA_DICT["SMB1 Master"].stage_data,
+            [
+                MissionData(MissionType.CHALLENGE_CLEAR,        [], category_mission=True, challenge_category_mission=True),
+                MissionData(MissionType.CHALLENGE_CLEAR_EXTRA,  [], 50, category_mission=True, challenge_category_mission=True),
+            ], challenge=True
+        ),
+    "SMB2 Casual":
+        CategoryData(
+            300000, "SMB2 Casual", Has("SMB2 Casual Challenge Mode"), MISSION_DATA_DICT["SMB2 Casual"].stage_data,
+            [
+                MissionData(MissionType.CHALLENGE_CLEAR,        [], category_mission=True, challenge_category_mission=True),
+                MissionData(MissionType.CHALLENGE_CLEAR_EXTRA,  [], 10, category_mission=True, challenge_category_mission=True),
+            ], challenge=True
+        ),
+    "SMB2 Normal":
+        CategoryData(
+            310000, "SMB2 Normal", Has("SMB2 Normal Challenge Mode"), MISSION_DATA_DICT["SMB2 Normal"].stage_data,
+            [
+                MissionData(MissionType.CHALLENGE_CLEAR,        [], category_mission=True, challenge_category_mission=True),
+                MissionData(MissionType.CHALLENGE_CLEAR_EXTRA,  [], 30, category_mission=True, challenge_category_mission=True),
+            ], challenge=True
+        ),
+    "SMB2 Expert":
+        CategoryData(
+            320000, "SMB2 Expert", Has("SMB2 Expert Challenge Mode"), MISSION_DATA_DICT["SMB2 Expert"].stage_data,
+            [
+                MissionData(MissionType.CHALLENGE_CLEAR,        [], category_mission=True, challenge_category_mission=True),
+                MissionData(MissionType.CHALLENGE_CLEAR_EXTRA,  [], 99, category_mission=True, challenge_category_mission=True),
+            ], challenge=True
+        ),
+    "SMB2 Master":
+        CategoryData(
+            330000, "SMB2 Master", Has("SMB2 Master Challenge Mode"), MISSION_DATA_DICT["SMB2 Master"].stage_data,
+            [
+                MissionData(MissionType.CHALLENGE_CLEAR,        [], category_mission=True, challenge_category_mission=True),
+                MissionData(MissionType.CHALLENGE_CLEAR_EXTRA,  [], 70, category_mission=True, challenge_category_mission=True),
+            ], challenge=True
+        ),
 }
